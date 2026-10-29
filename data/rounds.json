@@ -1,0 +1,37 @@
+{
+  "_note": "The rounds of How Rank is Your College? Mark posts each one with /admin round. 'new_policy_limit' caps brand-new policies per school in that round (amendments are unlimited). Edit the challenge text freely.",
+  "rounds": [
+    {
+      "key": "welcome",
+      "name": "Round 1: Welcome Week",
+      "new_policy_limit": 5,
+      "institutional": "Initial policies. As administrators, write and post 5 policies concerning AI, with pros and cons.",
+      "character": "How are you feeling at the start of this new year and this new adventure with AI?",
+      "challenge": "A syndicate of artificial intelligence companies, organized by charismatic celebrity billionaire Angelo Innocenzo \"A.I.\" Capone, has offered your university free AI in exchange for the use of all students' written work as training data for ten years. A.I. Capone arrives on campus surrounded by popular influencers. Do you say yes or no? Answer with /respond."
+    },
+    {
+      "key": "midterms",
+      "name": "Round 2: Midterms",
+      "new_policy_limit": 2,
+      "institutional": "Patches. Compensate for problems caused by your initial policies. Use /policy amend.",
+      "character": "Big compromises. Your character reluctantly hands something vital over to AI.",
+      "challenge": "The Big Digit Conference has announced that midterm rankings will be calculated by an AI. Nobody knows which one. How does your university respond?"
+    },
+    {
+      "key": "finals",
+      "name": "Round 3: Finals",
+      "new_policy_limit": 2,
+      "institutional": "Extreme Measures. Your patches created even more problems, and now you have to counter the amendments.",
+      "character": "The policies have caused chaos. Now what?",
+      "challenge": "Final exams are approaching and A.I. Capone wants to renegotiate. What extreme measure does your university take?"
+    },
+    {
+      "key": "graduation",
+      "name": "Epilogue: Graduation",
+      "new_policy_limit": 0,
+      "institutional": "Full steam ahead. What are the extreme implications of your policies?",
+      "character": "Trying to get a job. The future.",
+      "challenge": "Graduation day. Who, or what, gives the commencement address at your university?"
+    }
+  ]
+}

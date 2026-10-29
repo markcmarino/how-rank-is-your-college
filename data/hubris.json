@@ -1,0 +1,29 @@
+{
+  "_note": "Curse of Prestige: rolled by schools well above the median. Effects are multiplied by severity (negative means a loss). rival_effects apply to a random other school.",
+  "events": [
+    { "text": "{school}'s star dean has been poached by {rival}, along with her emotional support chatbot.",
+      "effects": { "prestige": -1, "morale": -0.5 }, "rival_effects": { "prestige": 0.4 } },
+    { "text": "A billionaire has donated a building to {school} that nobody asked for. Upkeep begins immediately.",
+      "effects": { "endowment": -1, "bureaucracy": 0.3 } },
+    { "text": "Applications to {school} tripled. The admissions office has walked out and taken the coffee maker.",
+      "effects": { "satisfaction": -0.6, "enrollment": -0.5, "chaos": 0.4 } },
+    { "text": "A glowing magazine profile of {school} has prompted an investigation into everything in it.",
+      "effects": { "prestige": -0.5, "lawsuits": 0.15 } },
+    { "text": "The {mascot}s' coach has demanded a raise larger than the library budget. It was granted.",
+      "effects": { "morale": -1, "endowment": -0.5 } },
+    { "text": "{school} has been asked to host the Big Digit Conference summit. All of it. Indefinitely.",
+      "effects": { "endowment": -0.7, "bureaucracy": 0.5 } },
+    { "text": "A.I. Capone has named {school} his favorite university, which is never good news.",
+      "effects": { "prestige": -0.6, "lawsuits": 0.1, "satisfaction": -0.4 } },
+    { "text": "{school}'s ranking has been printed on a tote bag. Faculty consider this the end of an era.",
+      "effects": { "morale": -0.8, "prestige": -0.3 } },
+    { "text": "The Office of Regression to the Mean has opened a satellite office on {school}'s campus.",
+      "effects": { "prestige": -0.8, "bureaucracy": 0.4 } },
+    { "text": "{school}'s viral success has attracted 4,000 consultants. They are all billing.",
+      "effects": { "endowment": -1, "chaos": 0.3 } },
+    { "text": "{rival} has hired away {school}'s entire IT department by promising them windows that open.",
+      "effects": { "morale": -0.6, "chaos": 0.5 }, "rival_effects": { "morale": 0.5 } },
+    { "text": "An alumnus has demanded his degree be revoked so he can brag about getting in again now.",
+      "effects": { "satisfaction": -0.5, "prestige": -0.4 } }
+  ]
+}

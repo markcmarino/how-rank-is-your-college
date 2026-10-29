@@ -1,0 +1,93 @@
+{
+  "_note": "Each policy is filed under one domain. 'effects' are baseline stat changes per policy (scaled by a random roll). Templates are used when the AI is off. Placeholders: {school} {mascot} {policy} {rival} {department}.",
+
+  "departments": [
+    "the Philosophy department", "Facilities Management", "the Registrar", "the Alumni Office",
+    "the Office of Student Wellness", "the Marching Band", "the Provost's Office", "Campus Parking",
+    "the Writing Center", "the Board of Trustees", "the Library", "the Athletics Booster Club",
+    "the Office of Institutional Research", "Dining Services", "the IT Help Desk"
+  ],
+
+  "domains": {
+    "Admissions": {
+      "effects": { "enrollment": 4, "prestige": 1, "lawsuits": 0.3, "chaos": 0.5 },
+      "templates": [
+        "Following the passage of \"{policy},\" applications to {school} doubled overnight. Half were written by the same chatbot.",
+        "\"{policy}\" has inspired {rival} to quietly copy it and claim it was their idea.",
+        "Admissions officers report that \"{policy}\" has made essays 40% more confident and 90% less true.",
+        "A prospective student toured {school}, heard about \"{policy},\" and applied on the spot. Their parents are suing.",
+        "{department} has formally asked what \"{policy}\" means. No one has answered."
+      ]
+    },
+    "Teaching": {
+      "effects": { "satisfaction": 2, "morale": -2, "prestige": 1, "chaos": 1 },
+      "templates": [
+        "Since \"{policy}\" took effect, attendance is up 300%. It is unclear how many attendees are human.",
+        "Faculty responded to \"{policy}\" by forming a committee to study forming a committee.",
+        "\"{policy}\" has produced the first syllabus in history that is longer than the course.",
+        "Students praise \"{policy}\" in course evaluations, which were also written under \"{policy}.\"",
+        "{department} has filed a grievance about \"{policy}\" using a template from {rival}."
+      ]
+    },
+    "Research": {
+      "effects": { "prestige": 3, "endowment": 1, "lawsuits": 0.4, "morale": -1 },
+      "templates": [
+        "\"{policy}\" yielded 1,400 papers this week. Reviewers are reviewing them with the same model that wrote them.",
+        "A grant agency praised \"{policy}\" in a press release, then rescinded the press release.",
+        "{school}'s lab, energized by \"{policy},\" has discovered a new element. It is mostly marketing.",
+        "\"{policy}\" has been cited by {rival} as a cautionary tale and a best practice, in the same paragraph.",
+        "The {mascot} statue has been named co-author on three papers under \"{policy}.\""
+      ]
+    },
+    "Student Life": {
+      "effects": { "satisfaction": 4, "enrollment": 1, "chaos": 1, "bureaucracy": 0.5 },
+      "templates": [
+        "\"{policy}\" has been widely celebrated with a party that {department} says it did not authorize.",
+        "Students have formed a club devoted to \"{policy}\" and a rival club devoted to ignoring it.",
+        "Since \"{policy},\" the dorms have been quieter. Too quiet. The roommates are all assistants now.",
+        "A TikTok explaining \"{policy}\" has more views than {school} has ever had applicants.",
+        "\"{policy}\" has led to a black market in vending machine snacks, somehow."
+      ]
+    },
+    "Athletics": {
+      "effects": { "prestige": 2, "endowment": 2, "satisfaction": 1, "lawsuits": 0.5 },
+      "templates": [
+        "Under \"{policy},\" the {mascot}s won by 63 points. The opposing team has requested an audit.",
+        "The coach credits \"{policy}\" for a perfect season of simulated games.",
+        "\"{policy}\" allowed {school} to recruit a quarterback who is technically a server rack.",
+        "{rival} has filed a protest over \"{policy}.\" The conference forwarded it to a chatbot.",
+        "Boosters love \"{policy}.\" They have asked that it be engraved on a new stadium."
+      ]
+    },
+    "Facilities": {
+      "effects": { "endowment": -2, "satisfaction": 2, "prestige": 1, "bureaucracy": 1 },
+      "templates": [
+        "\"{policy}\" replaced every water fountain with a rapid-charge station. Students report being thirsty but fully charged.",
+        "The new building required by \"{policy}\" is 80% complete and 0% understood.",
+        "{department} reports that \"{policy}\" caused the elevators to unionize.",
+        "Following \"{policy},\" the campus map has been updated 41 times today.",
+        "Facilities would like to remind everyone that \"{policy}\" did not include a budget."
+      ]
+    },
+    "Finance": {
+      "effects": { "endowment": 5, "satisfaction": -2, "lawsuits": 0.4, "bureaucracy": 1 },
+      "templates": [
+        "\"{policy}\" has raised the endowment and the eyebrows of state auditors.",
+        "Tuition is unchanged under \"{policy},\" but there is now a fee for asking about tuition.",
+        "Investors cheered \"{policy}\" and immediately shorted {rival}.",
+        "{department} has been sold to a hedge fund as a consequence of \"{policy}.\" It was going to happen anyway.",
+        "\"{policy}\" generated a surplus, which was spent on a consultant to explain \"{policy}.\""
+      ]
+    },
+    "Faculty & Staff": {
+      "effects": { "morale": 3, "prestige": 1, "endowment": -1, "bureaucracy": 1 },
+      "templates": [
+        "Faculty greeted \"{policy}\" with cautious optimism and a 90-page memo.",
+        "Staff report that \"{policy}\" doubled their workload and halved their parking.",
+        "\"{policy}\" has inspired three professors to retire and one chatbot to apply for tenure.",
+        "{rival} is trying to poach faculty by promising they will never hear the words \"{policy}\" again.",
+        "{department} has adopted \"{policy}\" with enthusiasm, mostly by misunderstanding it."
+      ]
+    }
+  }
+}

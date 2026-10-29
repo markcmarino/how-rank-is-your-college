@@ -1,0 +1,25 @@
+{
+  "_note": "Underdog boons: rolled by schools in the bottom of the table. Effects are multiplied by severity. rival_effects apply to a random other school.",
+  "events": [
+    { "text": "A TikTok about {school}'s cafeteria has gone viral. Nobody can agree whether it is praise.",
+      "effects": { "enrollment": 1, "prestige": 0.3 } },
+    { "text": "A disgraced Nobel laureate needed somewhere to land and chose {school}.",
+      "effects": { "prestige": 1, "lawsuits": 0.1 } },
+    { "text": "{school}'s low standards have been rebranded as \"radical access\" and won a grant.",
+      "effects": { "endowment": 1, "prestige": 0.3 } },
+    { "text": "A scandal at {rival} has sent transfer students fleeing to {school}.",
+      "effects": { "enrollment": 1 }, "rival_effects": { "enrollment": -0.5 } },
+    { "text": "A documentary crew mistook {school} for a scrappy upstart. The {mascot}s are playing along.",
+      "effects": { "prestige": 0.8, "satisfaction": 0.4 } },
+    { "text": "An anonymous alum has left {school} a vineyard and a strongly worded letter.",
+      "effects": { "endowment": 1, "satisfaction": 0.4 } },
+    { "text": "{school}'s servers crashed during a hype cycle, so it is now known as the last human university.",
+      "effects": { "prestige": 0.7, "morale": 0.5 } },
+    { "text": "A.I. Capone forgot {school} exists, which analysts are calling its best quarter ever.",
+      "effects": { "satisfaction": 0.8, "chaos": -0.5 } },
+    { "text": "{school}'s faculty, ignored by every ranking, have quietly done excellent work.",
+      "effects": { "morale": 1, "prestige": 0.4 } },
+    { "text": "A celebrity influencer enrolled at {school} by accident and has decided to stay.",
+      "effects": { "enrollment": 0.8, "prestige": 0.4 } }
+  ]
+}

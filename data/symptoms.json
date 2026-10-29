@@ -1,0 +1,30 @@
+{
+  "_note": "Hidden stats show up only as symptoms in a school's daily report. Each key is a condition the engine checks.",
+  "low_morale": [
+    "Faculty have begun eating lunch in their cars.",
+    "Office hours have been replaced by an out-of-office message.",
+    "Three professors were seen updating their LinkedIn profiles during commencement rehearsal.",
+    "The faculty senate meeting reached quorum only after counting the portraits."
+  ],
+  "high_bureaucracy": [
+    "Requests for new forms now require a form.",
+    "The committee on committees has formed a subcommittee.",
+    "A student waited six hours to drop a class and is now enrolled in two more.",
+    "The org chart has been printed on a scroll."
+  ],
+  "high_lawsuits": [
+    "Lawyers have been spotted in the dining hall, eating free.",
+    "The general counsel has stopped returning calls and started returning subpoenas.",
+    "Every campus email now ends with a 400-word disclaimer."
+  ],
+  "high_chaos": [
+    "Nobody is sure which building is the library this week.",
+    "The bell tower has started ringing in binary.",
+    "Two different presidents gave this year's welcome address. Both were confident."
+  ],
+  "low_satisfaction": [
+    "Students have begun referring to the campus as \"the facility.\"",
+    "The student newspaper is now printed entirely in complaint.",
+    "Tour guides walk backwards to keep an eye on the students."
+  ]
+}
