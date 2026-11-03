@@ -84,6 +84,12 @@ def test_leading_tags():
 
 def test_names_tickers_and_matching():
     assert parsing.split_camel("TaukTechU") == "Tauk Tech U"
+    assert parsing.split_camel("UniversityoftheCloud") == "University of the Cloud"
+    assert parsing.split_camel("UniversityOfTheCloud") == "University of the Cloud"
+    assert parsing.split_camel("PembertonCollegeofPrompts") == "Pemberton College of Prompts"
+    assert parsing.split_camel("TheInstituteofVibes") == "The Institute of Vibes"
+    assert parsing.split_camel("GrandPrairieIslandState") == "Grand Prairie Island State"
+    assert parsing.split_camel("university_of_the_cloud") == "University of the Cloud"
     assert parsing.ticker_for("TaukTechU", set()) == "TTU"
     assert parsing.ticker_for("TaukTechU", {"TTU"}) != "TTU"
     assert parsing.did_you_mean("TalkTechU", ["TaukTechU", "GrandPrairie"]) == "TaukTechU"

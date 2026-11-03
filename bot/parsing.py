@@ -49,11 +49,27 @@ def leading_tags(content: str) -> tuple[list[str], str]:
     return tags, body
 
 
+# Small words players often leave lowercase inside a hashtag (#UniversityoftheCloud). Only split off after
+# these nouns, so words like Grand, Island or Breathe stay whole.
+SMALL_WORDS = ("of", "the", "for", "and", "at", "in", "on")
+NAME_NOUNS = re.compile(r"^(University|Universidad|Institute|Institution|College|School|Academy|Polytechnic|"
+                        r"Seminary|Conservatory|Center|Centre|Campus)((?:of|the|for|and|at|in|on)+)$")
+
+
 def split_camel(tag: str) -> str:
-    """TaukTechU -> Tauk Tech U; grand_prairie_poly -> Grand Prairie Poly."""
+    """TaukTechU -> Tauk Tech U; grand_prairie_poly -> Grand Prairie Poly; UniversityoftheCloud -> University
+    of the Cloud."""
     tag = tag.replace("_", " ").replace("-", " ")
     spaced = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", tag)
-    return " ".join(w[:1].upper() + w[1:] for w in spaced.split())
+    words = []
+    for w in spaced.split():
+        glued = NAME_NOUNS.match(w)
+        if glued:
+            words += [glued.group(1)] + re.findall("|".join(SMALL_WORDS), glued.group(2))
+        else:
+            words.append(w)
+    return " ".join(w.lower() if i and w.lower() in SMALL_WORDS else w[:1].upper() + w[1:]
+                    for i, w in enumerate(words))
 
 
 def ticker_for(tag: str, taken: set[str]) -> str:
