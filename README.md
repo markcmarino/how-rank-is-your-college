@@ -11,10 +11,10 @@ Players don't need any commands. They just post, starting with hashtags, and the
 
 | Channel | What to post | What the bot does |
 | --- | --- | --- |
-| #college-fair-pitches | `#TaukTechU` then the pitch. Optional lines: `Name:`, `Mascot:`, `Colors:`, `Location:`, `Motto:` | The first post with a new hashtag registers the university and gives it a ticker (TTU). Later posts add to the pitch. 🏛️ |
-| #meet-the-students | `#Ellen #groundskeeper #TaukTechU` then the introduction | Files the character. 👋 |
-| #policies | `#TaukTechU` then the policy | Files it as the current round's kind (Policy, Amendment, Extreme Measure, Graduation Speech), guesses its domain from keywords, and prices it in at the next closing bell. 📜 |
-| #secret-diaries | `#Ellen #groundskeeper #TaukTechU` then the entry | Files it as evidence for the next closing bell. 📓 |
+| #college-pitches-rank | `#TaukTechU` then the pitch. Optional lines: `Name:`, `Mascot:`, `Colors:`, `Location:`, `Motto:` | The first post with a new hashtag registers the university and gives it a ticker (TTU). Later posts add to the pitch. 🏛️ |
+| #character-intros-rank | `#Ellen #groundskeeper #TaukTechU` then the introduction | Files the character. 👋 |
+| #policies-rank | `#TaukTechU` then the policy | Files it as the current round's kind (Policy, Amendment, Extreme Measure, Graduation Speech), guesses its domain from keywords, and prices it in at the next closing bell. 📜 |
+| #secret-diary-rank | `#Ellen #groundskeeper #TaukTechU` then the entry | Files it as evidence for the next closing bell. 📓 |
 
 - **Misspelled hashtag?** The bot replies "Did you mean #TaukTechU?" A genuinely new university that looks like
   an existing one can add `#new` to its first pitch.
@@ -29,7 +29,7 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
 
 - **Rounds open themselves** at midnight Pacific on the dates in the Sheet's Rounds tab (Nov 9, 13, 17 and 20).
   `/admin round` opens one by hand.
-- **The closing bell** runs every night at midnight: commentary, ticker and table in #the-exchange, each
+- **The closing bell** runs every night at midnight: commentary, ticker and table in #rankings-rank, each
   university's report in a thread under it, then the public page. `/admin convene` runs one early, and
   `preview:True` shows it to you first (post it with `/admin publish`).
 - **The finale**, whenever you like (including for groups playing out of season): `/admin vote open`, then

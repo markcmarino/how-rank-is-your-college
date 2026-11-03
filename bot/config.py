@@ -31,12 +31,12 @@ GUILD_ID = _int("GUILD_ID", 0)  # your server's ID; makes slash commands appear 
 
 # Channel names the bot reads and posts in (/admin setup creates any that are missing)
 CHANNELS = {
-    "announcements": os.getenv("ANNOUNCEMENTS_CHANNEL", "announcements"),
-    "fair": os.getenv("FAIR_CHANNEL", "college-fair-pitches"),
-    "students": os.getenv("STUDENTS_CHANNEL", "meet-the-students"),
-    "policies": os.getenv("POLICY_CHANNEL", "policies"),
-    "diaries": os.getenv("DIARY_CHANNEL", "secret-diaries"),
-    "exchange": os.getenv("EXCHANGE_CHANNEL", "the-exchange"),
+    "announcements": os.getenv("ANNOUNCEMENTS_CHANNEL", "start-here-rank"),
+    "fair": os.getenv("FAIR_CHANNEL", "college-pitches-rank"),
+    "students": os.getenv("STUDENTS_CHANNEL", "character-intros-rank"),
+    "policies": os.getenv("POLICY_CHANNEL", "policies-rank"),
+    "diaries": os.getenv("DIARY_CHANNEL", "secret-diary-rank"),
+    "exchange": os.getenv("EXCHANGE_CHANNEL", "rankings-rank"),
 }
 
 # Daily closing bell (and the time rounds open on their dates). Midnight Pacific by default.
