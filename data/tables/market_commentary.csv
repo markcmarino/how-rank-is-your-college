@@ -1,0 +1,32 @@
+Kind,Text
+Up Verb,rallied
+Up Verb,surged
+Up Verb,climbed
+Up Verb,inched up
+Up Verb,soared
+Up Verb,rebounded
+Up Verb,leapt
+Up Verb,crept higher
+Down Verb,slid
+Down Verb,tumbled
+Down Verb,sagged
+Down Verb,fell
+Down Verb,slumped
+Down Verb,dipped
+Down Verb,plunged
+Down Verb,drifted lower
+Reason,as investors digested {policy}
+Reason,on renewed confidence in {policy}
+Reason,after traders reread {policy}
+Reason,amid fresh questions about {policy}
+Reason,while analysts argued over {policy}
+Reason,after AI Corpone mentioned {policy} on a podcast
+Reason,as rumors about {policy} spread through the dining hall
+Reason,on news that {policy} is still in effect
+Reason,after a chatbot summarized {policy} incorrectly
+Reason,as {policy} entered its second news cycle
+Reason,"despite, or because of, {policy}"
+Reason,after a viral diary entry about {policy}
+Quiet Day,"Trading was quiet. Analysts blamed the weather, then the analysts."
+Quiet Day,The Exchange closed flat. Several traders were seen staring into the middle distance.
+Quiet Day,A slow day on the Exchange. Even AI Corpone took a nap.

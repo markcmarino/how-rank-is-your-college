@@ -28,22 +28,29 @@ def _bool(name: str, default: bool) -> bool:
 # Discord
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "")
 GUILD_ID = _int("GUILD_ID", 0)  # your server's ID; makes slash commands appear instantly
-CREATE_TEAM_CHANNELS = _bool("CREATE_TEAM_CHANNELS", True)
 
-# Channel names the bot looks for (and /admin setup creates)
+# Channel names the bot reads and posts in (/admin setup creates any that are missing)
 CHANNELS = {
     "announcements": os.getenv("ANNOUNCEMENTS_CHANNEL", "announcements"),
-    "exchange": os.getenv("EXCHANGE_CHANNEL", "the-exchange"),
-    "policies": os.getenv("POLICY_CHANNEL", "policy-register"),
+    "fair": os.getenv("FAIR_CHANNEL", "college-fair-pitches"),
+    "students": os.getenv("STUDENTS_CHANNEL", "meet-the-students"),
+    "policies": os.getenv("POLICY_CHANNEL", "policies"),
     "diaries": os.getenv("DIARY_CHANNEL", "secret-diaries"),
-    "fair": os.getenv("FAIR_CHANNEL", "college-fair"),
+    "exchange": os.getenv("EXCHANGE_CHANNEL", "the-exchange"),
 }
-TEAM_CATEGORY = os.getenv("TEAM_CATEGORY", "Universities")
 
-# Daily market close
-UPDATE_HOUR = _int("UPDATE_HOUR", 18)
+# Daily closing bell (and the time rounds open on their dates). Midnight Pacific by default.
+UPDATE_HOUR = _int("UPDATE_HOUR", 0)
 UPDATE_MINUTE = _int("UPDATE_MINUTE", 0)
 TIMEZONE = os.getenv("TIMEZONE", "America/Los_Angeles")
+
+# Lookup tables in Google Sheets (the long ID in the Sheet's web address). Blank = use data/tables/.
+TABLES_SHEET_ID = os.getenv("TABLES_SHEET_ID", "")
+
+# Public rankings page (US Snooze & Whirled Retort) on GitHub Pages. Blank token = local copy in site/ only.
+SITE_GITHUB_TOKEN = os.getenv("SITE_GITHUB_TOKEN", "")
+SITE_REPO = os.getenv("SITE_REPO", "")            # e.g. markcmarino/how-rank-is-your-college
+SITE_BRANCH = os.getenv("SITE_BRANCH", "gh-pages")
 
 # AI consequences (optional). Without an API key the bot uses the random tables.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")

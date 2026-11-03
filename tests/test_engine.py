@@ -1,15 +1,29 @@
 import asyncio
 import random
 
-from bot.cogs.diaries import parse_entry
+from bot import parsing, site
 from bot.db import Database
-from bot.engine import (AIResults, Diary, Interpretation, NewPolicy, School, load_data, run_day,
-                        starting_stats)
+from bot.engine import AIResults, Interpretation, NewPolicy, School, load_data, run_day, starting_stats
 from bot.game import Game
 
 
 def make_schools(n, data, rng):
     return [School(i, f"School {i}", f"S{i}", "Owl", starting_stats(data["tuning"], rng)) for i in range(1, n + 1)]
+
+
+def new_game(tmp_path, seed=0):
+    db = Database(tmp_path / "t.db")
+    return db, Game(db, rng=random.Random(seed))
+
+
+# ---- tables and engine -----------------------------------------------------
+
+def test_starter_tables_load():
+    data = load_data()
+    assert len(data["domains"]) == 8
+    assert len(data["consequences"]) > 50 and data["hubris"] and data["underdog"] and data["diary_leaks"]
+    assert [r["key"] for r in data["rounds"]] == ["welcome", "midterms", "finals", "graduation"]
+    assert data["commentary"]["reason"]
 
 
 def test_stats_stay_in_bounds():
@@ -24,21 +38,20 @@ def test_stats_stay_in_bounds():
                 assert 0 <= value <= (10 if name == "lawsuits" else 100), (name, value)
 
 
-def test_market_is_ranked_and_priced():
-    data, rng = load_data(), random.Random(1)
-    result = run_day(make_schools(5, data, rng), [], [], {}, data, rng)
-    ranks = [r["rank"] for r in result.market]
-    assert ranks == [1, 2, 3, 4, 5]
-    scores = [r["score"] for r in result.market]
-    assert scores == sorted(scores, reverse=True)
-    assert all(r["price"] > 0 for r in result.market)
+def test_no_unfilled_placeholders():
+    data, rng = load_data(), random.Random(9)
+    schools = make_schools(6, data, rng)
+    for kind in ("Policy", "Amendment", "Extreme Measure", "Graduation Speech"):
+        for _ in range(40):
+            result = run_day(schools, [NewPolicy(1, 1, 1, "Robots attend class", None, kind)], [], {}, data, rng)
+            for e in result.events:
+                assert "{" not in e.text, e.text
 
 
 def test_ai_interpretation_overrides_tables():
     data, rng = load_data(), random.Random(2)
-    schools = make_schools(3, data, rng)
     ai = AIResults(policies={7: Interpretation({"prestige": 5}, "The geese approve.")})
-    result = run_day(schools, [NewPolicy(7, 1, 1, "Geese", "Teaching")], [], {}, data, rng, ai)
+    result = run_day(make_schools(3, data, rng), [NewPolicy(7, 1, 1, "Geese", "Teaching")], [], {}, data, rng, ai)
     assert any(e.text == "The geese approve." and e.policy_id == 7 for e in result.events)
 
 
@@ -47,43 +60,94 @@ def test_curse_hits_runaway_leader():
     data["tuning"]["daily_drift"] = 0
     schools = make_schools(10, data, rng)
     schools[0].stats.update(prestige=100, endowment=100, enrollment=100, satisfaction=100)
-    hits = 0
-    for _ in range(200):
-        result = run_day(schools, [], [], {}, data, rng)
-        hits += any(e.kind == "curse" and e.school_id == schools[0].id for e in result.events)
-    assert hits > 60   # roughly half the time at maximum lead
+    hits = sum(any(e.kind == "curse" and e.school_id == 1 for e in run_day(schools, [], [], {}, data, rng).events)
+               for _ in range(200))
+    assert hits > 60
 
 
 def test_accreditation_strikes_a_policy():
     data, rng = load_data(), random.Random(4)
     schools = make_schools(3, data, rng)
     schools[0].stats["lawsuits"] = 9
-    result = run_day(schools, [], [], {1: [(55, "Bad idea")]}, data, rng)
-    assert 55 in result.struck_down
+    assert 55 in run_day(schools, [], [], {1: [(55, "Bad idea")]}, data, rng).struck_down
 
 
-def test_diary_parsing():
-    find = lambda tag: {"id": 1, "name": "Grand Prairie U"} if tag.lower() in ("grandprairieu", "grpu") else None
-    school, character, role, body = parse_entry("#Dana #groundskeeper #GRPU\nThe sprinklers talk now.", find)
-    assert school["id"] == 1 and character == "Dana" and role == "groundskeeper"
-    assert body == "The sprinklers talk now."
-    school, character, role, body = parse_entry("#Dana #student Today I met my robot.", find)
-    assert school is None and character == "Dana" and body == "Today I met my robot."
+# ---- reading posts -----------------------------------------------------------
+
+def test_leading_tags():
+    assert parsing.leading_tags("#Ellen #groundskeeper #TaukTechU\nThe field is daffodils.") == \
+        (["Ellen", "groundskeeper", "TaukTechU"], "The field is daffodils.")
+    assert parsing.leading_tags("#Tanner #student @TaukTechU\nI learned Hume.") == \
+        (["Tanner", "student", "TaukTechU"], "I learned Hume.")
+    assert parsing.leading_tags("#TaukTechU All lectures are robots.") == (["TaukTechU"], "All lectures are robots.")
 
 
-def test_full_close_with_database(tmp_path):
-    db = Database(tmp_path / "t.db")
-    db.set("mode", "tables")
-    game = Game(db, rng=random.Random(5))
-    ids = [db.add_school(dict(name=f"U{i}", code=f"UU{i}", location="", specialties="", reputation="",
-                              colors="", mascot="Owl", motto=None), game.new_school_stats()) for i in range(4)]
-    p = db.add_policy(ids[0], "Robots attend all lectures", "Text", "Pro", "Con", "Teaching", "welcome", 1)
-    db.add_diary(ids[0], 1, "Pat", "student", "The robot took my seat.", 0)
-    db.add_response(ids[1], "welcome", "Yes, obviously.")
-    report = asyncio.run(game.close())
-    game.commit(report)
-    assert db.day == 1
-    assert db.unprocessed_policies() == []
-    assert db.policy_log(p["id"])
-    assert "UNDERACADEMY EXCHANGE" in report.ticker
+def test_names_tickers_and_matching():
+    assert parsing.split_camel("TaukTechU") == "Tauk Tech U"
+    assert parsing.ticker_for("TaukTechU", set()) == "TTU"
+    assert parsing.ticker_for("TaukTechU", {"TTU"}) != "TTU"
+    assert parsing.did_you_mean("TalkTechU", ["TaukTechU", "GrandPrairie"]) == "TaukTechU"
+    domains = load_data()["domains"]
+    assert parsing.classify("All dorms become data centers and the cafeteria is a server room.", domains) \
+        in ("Student Life", "Facilities")
+    rounds = load_data()["rounds"]
+    assert parsing.round_tag(["round1"], rounds)["key"] == "welcome"
+    assert parsing.round_tag(["Midterms"], rounds)["key"] == "midterms"
+    assert parsing.round_tag(["round"], rounds) is None
+
+
+def test_posting_flow(tmp_path):
+    db, game = new_game(tmp_path)
+    game.open_round("welcome")
+    filed = game.register_or_pitch("#TaukTechU\nWhere robots go to class so you don't have to.\nMascot: Taukens",
+                                   1, "Ana", 101)
+    assert filed.ok and filed.new_school and filed.school["code"] == "TTU" and filed.school["mascot"] == "Taukens"
+    typo = game.register_or_pitch("#TalkTechU\nAnother pitch", 2, "Ben", 102)
+    assert not typo.ok and "#TaukTechU" in typo.message
+    assert game.file_character("#Ellen #groundskeeper #TaukTechU\nI plant things.", 2, "Ben", 103).ok
+    policy = game.file_policy("#TaukTechU Only robots may attend class. Boon: free AI. Concession: no humans.",
+                              1, "Ana", 104)
+    assert policy.ok and policy.message == "TTU-1"
+    late = game.file_policy("#TaukTechU #round1 Dorms become data centers.", 2, "Ben", 105)
+    assert late.ok
+    game.open_round("midterms")
+    patch = game.file_policy("#TaukTechU Robots must now bring humans to class.", 1, "Ana", 106)
+    assert db.policy_by_number(filed.school["id"], 3)["kind"] == "Amendment"
+    assert patch.ok
+    assert game.file_diary("#Ellen #groundskeeper #TaukTechU #round1\nDaffodils everywhere.", 2, "Ben", 107).ok
+    bad = game.file_diary("#Ellen #groundskeeper #TaukTekU\nOops.", 2, "Ben", 108)
+    assert not bad.ok and "Did you mean" in bad.message
+    csv_text = game.participation_csv()
+    assert "Ana" in csv_text and "Round 1: Welcome Week" in csv_text
+
+
+def test_close_site_and_finale(tmp_path):
+    db, game = new_game(tmp_path, seed=5)
+    game.open_round("welcome")
+    for i, tag in enumerate(["TaukTechU", "GrandPrairiePoly", "SaintAlgorithm", "LakeHubris"]):
+        game.register_or_pitch(f"#{tag}\nA fine institution.", i, f"P{i}", 200 + i)
+        game.file_policy(f"#{tag} All lectures are given by robots in the stadium.", i, f"P{i}", 300 + i)
+        game.file_diary(f"#Pat #student #{tag}\nThe robot took my seat.", i, f"P{i}", 400 + i)
+    for _ in range(3):
+        report = asyncio.run(game.close())
+        game.commit(report)
+    assert db.day == 3 and db.unprocessed_policies() == []
+    files = site.build(db, game)
+    assert "US Snooze &amp; Whirled Retort" in files["index.html"] and "Tauk Tech U" in files["index.html"]
+    assert game.verdict_by_audit()[0]["rank"] == 1
+    assert not game.can_vote_for(0, db.find_school("TaukTechU")["id"])
+    assert game.can_vote_for(0, db.find_school("LakeHubris")["id"])
+    late = game.register_or_pitch("#LateComerU\nWe just got here.", 9, "Late", 500)
+    snap = db.all_stats()
+    assert abs(snap[late.school["id"]]["prestige"] - snap[db.find_school("TaukTechU")["id"]]["prestige"]) < 15
     assert "Collected Statutes" in game.export_statutes()
+
+
+def test_due_round(tmp_path):
+    from datetime import date
+    db, game = new_game(tmp_path)
+    assert game.due_round(date(2026, 11, 8)) is None
+    assert game.due_round(date(2026, 11, 9))["key"] == "welcome"
+    game.open_round("welcome")
+    assert game.due_round(date(2026, 11, 12)) is None
+    assert game.due_round(date(2026, 11, 18))["key"] == "finals"

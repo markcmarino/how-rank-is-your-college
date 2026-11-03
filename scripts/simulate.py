@@ -16,7 +16,6 @@ from pathlib import Path
 from bot.db import Database
 from bot.engine import load_data
 from bot.game import Game
-from bot import engine
 
 NAMES = ["Grand Prairie Polytechnic", "Saint Algorithm College", "Upper Marlboro Tech", "Halcyon State",
          "The Institute of Vibes", "Northeast Southwestern", "Bayou Digital University", "Crestfall A&M",
@@ -35,32 +34,30 @@ async def season(n_schools: int, days: int, seed: int, curse: bool) -> None:
     rng = random.Random(seed)
     tmp = Path(tempfile.mkdtemp()) / "sim.db"
     db = Database(tmp)
-    db.set("mode", "tables")
     game = Game(db, rng=random.Random(seed))
     data = load_data()
     if not curse:
-        data["tuning"]["curse_of_prestige"]["chance_per_lead"] = 0
-        data["tuning"]["curse_of_prestige"]["base_chance"] = 0
-        data["tuning"]["underdog"]["chance_per_deficit"] = 0
-        data["tuning"]["underdog"]["base_chance"] = 0
-        engine.load_data = lambda: data   # patch for this run only
-        import bot.game as game_module
-        game_module.load_data = lambda: data
-    domains = list(data["domains"]["domains"])
+        for table in ("curse_of_prestige", "underdog"):
+            data["tuning"][table]["base_chance"] = 0
+            data["tuning"][table]["chance_per_lead" if table == "curse_of_prestige" else "chance_per_deficit"] = 0
+    game.data_override = data
+    game.open_round("welcome")
+    tags = []
     for i, name in enumerate(NAMES[:n_schools]):
-        sid = db.add_school(dict(name=name, code="".join(w[0] for w in name.split())[:4].upper() + str(i),
-                                 location="Somewhere", specialties="AI", reputation="Rising", colors="Blue",
-                                 mascot="Owl", motto=None), game.new_school_stats())
-        db.join(1000 + i, sid)
+        tag = name.replace(" ", "").replace("&", "")
+        game.register_or_pitch(f"#{tag}\nA fine institution.", 1000 + i, f"Player {i}", 10_000 + i)
+        tags.append(tag)
 
     gaps = []
     for day in range(1, days + 1):
-        for s in db.schools():
+        msg = 20_000 + day * 1000
+        for i, tag in enumerate(tags):
             if rng.random() < 0.35:
-                db.add_policy(s["id"], rng.choice(TITLES), "Policy text.", "", "", rng.choice(domains),
-                              "welcome", 1)
+                game.file_policy(f"#{tag} {rng.choice(TITLES)}.", 1000 + i, f"Player {i}", msg + i)
             if rng.random() < 0.5:
-                db.add_diary(s["id"], 1, "Pat", rng.choice(["student", "professor"]), "Dear diary, today...", 0)
+                game.file_diary(f"#Pat #{rng.choice(['student', 'professor'])} #{tag}\nDear diary, today the "
+                                f"robots took attendance and I was marked absent.", 1000 + i, f"Player {i}",
+                                msg + 500 + i)
         report = await game.close()
         game.commit(report)
         scores = [r["score"] for r in report.result.market]

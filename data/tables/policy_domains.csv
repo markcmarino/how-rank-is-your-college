@@ -1,0 +1,9 @@
+Domain,Keywords,Prestige,Endowment,Enrollment,Satisfaction,Morale,Bureaucracy,Lawsuits,Chaos
+Admissions,"admission, admissions, apply, applicant, application, essay, recruit, enroll, enrollment, tour, legacy, prospective, acceptance, waitlist",1,0,4,0,0,0,0.3,0.5
+Teaching,"class, classes, course, lecture, syllabus, syllabi, exam, exams, grade, grades, grading, homework, assignment, tutor, attendance, cheating, plagiarism, curriculum, seminar, major, credit",1,0,0,2,-2,0,0,1
+Research,"research, lab, labs, paper, papers, publish, publication, grant, grants, data, dataset, thesis, dissertation, experiment, study, peer review",3,1,0,0,-1,0,0.4,0
+Student Life,"dorm, dorms, housing, club, clubs, party, roommate, dining, cafeteria, food, meal, wellness, mental health, social, student union, counseling, sleep, dating, residence",0,0,1,4,0,0.5,0,1
+Athletics,"team, teams, coach, game, games, stadium, athlete, athletes, football, basketball, soccer, sport, sports, mascot, tailgate, recruit athletes, esports",2,2,0,1,0,0,0.5,0
+Facilities,"building, buildings, library, parking, campus, fountain, elevator, data center, server, servers, power, electricity, grounds, charging, robot, robots, drone, drones, camera, cameras, surveillance",1,-2,0,2,0,1,0,0
+Finance,"tuition, fee, fees, budget, endowment, donor, donors, money, loan, loans, scholarship, scholarships, subscription, contract, payment, discount, revenue, invest, profit, sponsor",0,5,0,-2,0,1,0.4,0
+Faculty & Staff,"faculty, staff, professor, professors, tenure, salary, salaries, union, adjunct, dean, deans, hiring, layoff, layoffs, workload, office hours, employee, employees, advisor, mentor, workstudy",1,-1,0,0,3,1,0,0

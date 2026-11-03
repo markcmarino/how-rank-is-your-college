@@ -1,38 +1,63 @@
 # How Rank is Your College?
 
-A Discord bot for the UnderAcademy Exchange netprov. Teams found fictional universities, pass absurd AI
-policies, and write Secret Diaries about living under them. Every day at the closing bell, the bot prices
-each university as a stock, posts a ticker and the Big Digit Conference rankings, and sends each team a
-report on what its policies caused. The rankings are for show: the player vote crowns the winner.
+A Discord bot for the UnderAcademy Exchange netprov. Players found fictional universities, post absurd AI
+policies, and write Secret Diaries about living under them. Every night at midnight Pacific the bot prices each
+university as a stock, posts the closing bell in Discord, and publishes the rankings as a public web page,
+the **US Snooze & Whirled Retort**.
 
-## How the game maps to the bot
+Players don't need any commands. They just post, starting with hashtags, and the bot files each post.
 
-| How to Play | What players do in Discord |
-| --- | --- |
-| Invent your University | `/found` (name, ticker, location, specialties, reputation, colors, mascot, motto). Teammates use `/join`. |
-| College Fair Pitch | `/pitch` opens a form; the pitch is posted in #college-fair. |
-| Write 5 AI policies with pros and cons | `/policy propose` (pick a domain, then fill in a form). Posted in #policy-register as e.g. GRPU-3. |
-| Revise policies (patches, Extreme Measures) | `/policy amend GRPU-3` or `/policy repeal GRPU-3`. Old versions stay in the register. |
-| Round challenges (A.I. Capone's offer, etc.) | Mark runs `/admin round`; teams answer with `/respond`. |
-| Secret Diaries | Post in #secret-diaries starting with `#charactername #role #universityname`. The bot files it (📓) and uses it as evidence. |
-| Rankings | Daily closing bell in #the-exchange, plus `/rankings` any time. Teams get a daily report in their private channel, or with `/report`. |
-| The archive | `/admin export` downloads *The Collected Statutes* (policies, consequences, pitches, diaries) and the price history. |
+## How players play
 
-Other player commands: `/policies [university]`, `/policy view GRPU-3`, `/round`.
+| Channel | What to post | What the bot does |
+| --- | --- | --- |
+| #college-fair-pitches | `#TaukTechU` then the pitch. Optional lines: `Name:`, `Mascot:`, `Colors:`, `Location:`, `Motto:` | The first post with a new hashtag registers the university and gives it a ticker (TTU). Later posts add to the pitch. 🏛️ |
+| #meet-the-students | `#Ellen #groundskeeper #TaukTechU` then the introduction | Files the character. 👋 |
+| #policies | `#TaukTechU` then the policy | Files it as the current round's kind (Policy, Amendment, Extreme Measure, Graduation Speech), guesses its domain from keywords, and prices it in at the next closing bell. 📜 |
+| #secret-diaries | `#Ellen #groundskeeper #TaukTechU` then the entry | Files it as evidence for the next closing bell. 📓 |
 
-Game-master commands (only visible to people with Manage Server): `/admin setup`, `/admin round`,
-`/admin convene` (run a close now, optionally as a preview), `/admin publish`, `/admin decree`,
-`/admin strike`, `/admin mode`, `/admin pause`, `/admin peek`, `/admin export`.
+- **Misspelled hashtag?** The bot replies "Did you mean #TaukTechU?" A genuinely new university that looks like
+  an existing one can add `#new` to its first pitch.
+- **Catching up?** Add a round tag, such as `#round1`, `#welcomeweek`, `#midterms`, `#finals` or `#epilogue`, and
+  the post counts for that round. A policy post can also say its kind with `#amendment`, `#extrememeasure` or `#speech`.
+- **Joining late?** A university registered after the first closing bell starts at the current median, so it
+  enters the rankings in the middle of the pack.
+
+Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`, `/round`, and `/vote` when voting is open.
+
+## Running the game (Mark and Rob)
+
+- **Rounds open themselves** at midnight Pacific on the dates in the Sheet's Rounds tab (Nov 9, 13, 17 and 20).
+  `/admin round` opens one by hand.
+- **The closing bell** runs every night at midnight: commentary, ticker and table in #the-exchange, each
+  university's report in a thread under it, then the public page. `/admin convene` runs one early, and
+  `preview:True` shows it to you first (post it with `/admin publish`).
+- **The finale**, whenever you like (including for groups playing out of season): `/admin vote open`, then
+  `/admin vote close` to announce the people's champion (players can't vote for a university they posted for),
+  or `/admin verdict` to crown a winner from the rankings after a randomized Final Audit.
+- **Grading:** `/admin participation` downloads a spreadsheet of every player's posts by kind and round, with
+  word counts and dates.
+- **Other tools:** `/admin decree` (a custom event, optionally moving a stat), `/admin strike TTU-3`,
+  `/admin school` (fix a name, ticker or mascot), `/admin peek` (hidden stats), `/admin pause`,
+  `/admin export` (*The Collected Statutes* and the price history), `/admin setup` (create missing channels).
+
+### Editing the lookup tables
+
+All the flavor text and policy effects live in the Google Sheet
+[How Rank is Your College? Lookup Tables](https://docs.google.com/spreadsheets/d/1ubSMUIj99iqO6Dx_BE7EbwDM6_96uyfE2pmGIuhY6Rg/edit).
+Its Read Me tab explains each tab and the placeholders. The bot rereads it every night; `/admin tables` reloads it
+immediately and reports any tab it couldn't read. If the Sheet can't be reached, the bot uses the last good copy,
+and failing that the starter copies in `data/tables/`. Balance numbers that rarely change are in `data/tuning.json`.
 
 ## Setup
 
 ### 1. Create the bot in Discord (about 10 minutes, once)
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Name it (for example "UnderAcademy Exchange").
-2. Open **Bot** in the sidebar. Under **Privileged Gateway Intents**, turn on **Message Content Intent** (the bot needs it to read Secret Diaries).
-3. On the same page, click **Reset Token** and copy the token. Treat it like a password: don't paste it in chats or commit it to GitHub.
-4. Open **OAuth2 → URL Generator**. Check the scopes **bot** and **applications.commands**. Under bot permissions, check: View Channels, Send Messages, Read Message History, Add Reactions, Attach Files, Manage Channels, Manage Roles. Open the generated URL and add the bot to your server.
-5. In Discord, turn on **User Settings → Advanced → Developer Mode**, then right-click your server's icon and choose **Copy Server ID**.
+2. Open **Bot**. Under **Privileged Gateway Intents**, turn on **Message Content Intent** (the bot reads posts).
+3. On the same page, click **Reset Token** and copy the token. Treat it like a password.
+4. Open **OAuth2 → URL Generator**. Check the scopes **bot** and **applications.commands**. Bot permissions: View Channels, Send Messages, Send Messages in Threads, Create Public Threads, Read Message History, Add Reactions, Attach Files, Manage Channels. Open the generated URL and add the bot to your server.
+5. In Discord, turn on **User Settings → Advanced → Developer Mode**, then right-click the server icon and **Copy Server ID**.
 
 ### 2. Install and configure
 
@@ -45,50 +70,47 @@ pip install -r requirements.txt
 cp .env.example .env             # then edit .env
 ```
 
-In `.env`, paste your bot token into `DISCORD_TOKEN` and your server ID into `GUILD_ID`. Set the closing
-bell time and time zone. To have Claude write the consequences, add an `ANTHROPIC_API_KEY` from
-[console.anthropic.com](https://console.anthropic.com) (this is separate from a Claude Pro subscription and
-is billed per use). Without a key, the bot uses the random consequence tables.
+In `.env`, paste the bot token into `DISCORD_TOKEN` and the server ID into `GUILD_ID`. The Sheet ID is
+already filled in.
 
-### 3. Run it
+### 3. Turn on the public page (optional)
+
+1. Make this repo public (GitHub → Settings → General → Danger Zone → Change visibility). Free GitHub Pages needs it.
+2. Create a token at GitHub → Settings → Developer settings → **Fine-grained personal access tokens**: only this
+   repository, with **Contents: Read and write**. Paste it into `SITE_GITHUB_TOKEN` in `.env`.
+3. After the first closing bell creates the `gh-pages` branch, go to the repo's **Settings → Pages** and set
+   the source to **Deploy from a branch**, branch `gh-pages`, folder `/ (root)`.
+
+The page appears at https://markcmarino.github.io/how-rank-is-your-college/ and updates every night, with
+an archive of each day at `archive/day-N.html`. Even without a token, the bot writes the page to `site/index.html`.
+
+### 4. Run it
 
 ```bash
 python -m bot
 ```
 
-Then in Discord run `/admin setup` to create the public channels, and `/admin round` to open Welcome Week.
-
-To keep the game running while your computer sleeps, run the bot on an always-on machine or a small cloud
-server. The database is the single file `game.db`; back it up to back up the game.
+Then in Discord run `/admin setup` to create the channels. The bot must keep running for the whole game, so use
+a computer that stays awake or a small cloud server. The database is the single file `game.db`; back it up to
+back up the game.
 
 ## Testing and tuning
 
 ```bash
-python -m pytest tests                     # engine tests
-python -m scripts.simulate                 # a fake 25-school, 25-day season
-python -m scripts.simulate --no-curse      # the same season without the Curse of Prestige
+python -m pytest tests                     # tests
+python -m scripts.simulate --days 14       # a fake 25-university season
+python -m scripts.simulate --no-curse      # the same, without the Curse of Prestige
 ```
-
-All balance numbers live in `data/tuning.json`, and all flavor text in the other files in `data/`:
-consequence templates by domain (`domains.json`), the Curse of Prestige (`hubris.json`), underdog luck
-(`underdog.json`), hidden-stat symptoms (`symptoms.json`) and the rounds and their challenges
-(`rounds.json`). The bot rereads them at every closing bell, so edits take effect without a restart.
-
-In the default simulation, the Curse of Prestige keeps first place about 3 points above the median on
-average, versus about 8 without it. The whole field is fairly tight; raise the policy effects in
-`domains.json` or `daily_drift` in `tuning.json` for bigger swings.
 
 ## How a closing bell works
 
-1. Each new policy or amendment moves the school's stats, either as Claude decides (AI mode, clamped to the
-   limits in `tuning.json`) or by its domain's baseline effects times a random roll. Every policy adds
-   Bureaucracy, which dampens future gains, and Chaos, which widens future rolls.
-2. Secret Diaries are evidence: they add buzz (Prestige) and shift Faculty Morale or Student Satisfaction.
-   In AI mode, Claude reads them and decides what they reveal.
-3. Answers to the round's challenge move the stats too.
-4. Every stat drifts a little; hidden stats drift back toward normal.
-5. The Curse of Prestige: the further a school is above the median, the more likely and severe its bad luck.
-   Schools in the bottom quarter get a chance at a lucky break.
-6. Thresholds: an occupation (low Satisfaction), faculty poaching (low Morale), an accreditation visit that
-   strikes down a policy (high Lawsuit Exposure), a fire sale (empty Endowment).
-7. Share price = 2.5 × a weighted score of the four public stats (Prestige 40%, the others 20% each).
+1. Each new policy post moves its university's stats by its domain's effects (from the Sheet) times a random
+   roll. Every post adds Bureaucracy, which dampens future gains, and Chaos, which widens future rolls.
+2. Secret Diaries are evidence: they add buzz (Prestige), shift Faculty Morale or Student Satisfaction, and one
+   is quoted as a "leak."
+3. Every stat drifts a little; hidden stats drift back toward normal.
+4. The Curse of Prestige: the further a university is above the median, the likelier and harsher its bad luck.
+   The bottom quarter gets a chance at a lucky break.
+5. Thresholds: an occupation (low Satisfaction), faculty poaching (low Morale), an accreditation visit that strikes
+   down a policy (high Lawsuit Exposure), a fire sale (empty Endowment).
+6. Share price = 2.5 × a weighted score of the public stats (Prestige 40%, Endowment, Enrollment and Satisfaction 20% each).

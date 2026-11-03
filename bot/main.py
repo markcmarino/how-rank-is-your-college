@@ -1,47 +1,48 @@
-"""The Discord bot: startup, posting, and the daily market close."""
+"""The Discord bot: startup, posting, and the nightly routine (tables, rounds, closing bell, public page)."""
 
 from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import time
+from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
 import discord
 from discord.ext import commands, tasks
 
-from . import config, reports
+from . import config, reports, site, tables
 from .db import Database
 from .game import CloseReport, Game
 
 log = logging.getLogger("rankbot")
 
-CLOSE_TIME = time(hour=config.UPDATE_HOUR, minute=config.UPDATE_MINUTE, tzinfo=ZoneInfo(config.TIMEZONE))
+ZONE = ZoneInfo(config.TIMEZONE)
+NIGHTLY = time(hour=config.UPDATE_HOUR, minute=config.UPDATE_MINUTE, tzinfo=ZONE)
 
 
 class RankBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.message_content = True   # needed to read Secret Diary posts
+        intents.message_content = True   # needed to read players' posts
         super().__init__(command_prefix="!", intents=intents)
         self.db = Database(config.DB_PATH)
         self.game = Game(self.db)
         self.close_lock = asyncio.Lock()
 
     async def setup_hook(self) -> None:
-        await self.load_extension("bot.cogs.players")
-        await self.load_extension("bot.cogs.diaries")
-        await self.load_extension("bot.cogs.admin")
+        await self.loop.run_in_executor(None, tables.refresh)
+        for ext in ("bot.cogs.posts", "bot.cogs.players", "bot.cogs.admin"):
+            await self.load_extension(ext)
         if config.GUILD_ID:
             guild = discord.Object(id=config.GUILD_ID)
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
         else:
             await self.tree.sync()
-        self.market_close.start()
+        self.nightly.start()
 
     async def on_ready(self) -> None:
-        log.info("Logged in as %s; market closes daily at %s %s", self.user, CLOSE_TIME, config.TIMEZONE)
+        log.info("Logged in as %s; closing bell daily at %s %s", self.user, NIGHTLY, config.TIMEZONE)
 
     # ---- helpers ---------------------------------------------------------
     def home_guild(self) -> discord.Guild | None:
@@ -51,29 +52,62 @@ class RankBot(commands.Bot):
 
     def channel(self, key: str) -> discord.TextChannel | None:
         guild = self.home_guild()
-        if guild is None:
-            return None
-        return discord.utils.get(guild.text_channels, name=config.CHANNELS[key])
+        return discord.utils.get(guild.text_channels, name=config.CHANNELS[key]) if guild else None
 
-    async def post(self, key: str, text: str) -> None:
+    async def post(self, key: str, text: str) -> discord.Message | None:
         channel = self.channel(key)
         if channel is None:
             log.warning("Channel #%s not found; run /admin setup", config.CHANNELS[key])
-            return
+            return None
+        first = None
         for chunk in reports.split(text):
-            await channel.send(chunk)
+            sent = await channel.send(chunk)
+            first = first or sent
+        return first
+
+    def market_rows(self, day: int) -> list[dict]:
+        snap, prev = self.db.snapshot(day), self.db.snapshot(day - 1)
+        rows = []
+        for s in self.db.schools():
+            if s["id"] in snap:
+                r, p = snap[s["id"]], prev.get(s["id"])
+                rows.append({"name": s["name"], "code": s["code"], "price": r["price"], "score": r["score"],
+                             "rank": r["rank"], "prev_price": p["price"] if p else None,
+                             "prev_rank": p["rank"] if p else None})
+        return rows
+
+    async def announce_round(self, rnd: dict | None) -> None:
+        if rnd:
+            await self.post("announcements", f"📯 **{rnd['name']} begins!**\n\n"
+                                             f"**Administrators:** {rnd['institutional']}\n\n"
+                                             f"**Characters:** {rnd['character']}\n\n"
+                                             f"_Catching up on an earlier round? Add its tag, like #round1, "
+                                             f"to your post._")
 
     async def publish(self, report: CloseReport) -> None:
-        """Posts a market close: commentary, ticker and table to the exchange; reports to team channels."""
+        """Posts a closing bell: commentary, ticker and table, with each university's report in a thread."""
         await self.post("exchange", f"🔔 **Closing Bell · Day {report.day}**\n{report.commentary}")
         await self.post("exchange", report.ticker)
-        await self.post("exchange", report.table)
-        for school in self.db.schools():
-            text = report.school_reports.get(school["id"])
-            channel = self.get_channel(school["channel_id"]) if school["channel_id"] else None
-            if text and channel:
-                for chunk in reports.split(text):
-                    await channel.send(chunk)
+        table_msg = await self.post("exchange", report.table)
+        if table_msg is not None and report.school_reports:
+            try:
+                thread = await table_msg.create_thread(name=f"Day {report.day} university reports")
+                for text in report.school_reports.values():
+                    for chunk in reports.split(text):
+                        await thread.send(chunk)
+            except discord.HTTPException:
+                log.exception("Couldn't post the daily reports thread")
+        await self.update_site()
+
+    async def update_site(self) -> None:
+        try:
+            files = site.build(self.db, self.game)
+            site.write_local(files)
+            url = await self.loop.run_in_executor(None, site.publish, files)
+            if url:
+                log.info("Published the US Snooze & Whirled Retort at %s", url)
+        except Exception:
+            log.exception("Couldn't update the public rankings page")
 
     async def run_close(self) -> CloseReport | None:
         async with self.close_lock:
@@ -84,20 +118,27 @@ class RankBot(commands.Bot):
         await self.publish(report)
         return report
 
-    # ---- the daily market close --------------------------------------------
-    @tasks.loop(time=CLOSE_TIME)
-    async def market_close(self) -> None:
+    # ---- every night at the closing bell ---------------------------------------
+    @tasks.loop(time=NIGHTLY)
+    async def nightly(self) -> None:
         if self.db.get("paused") == "1":
-            log.info("Market close skipped: paused")
+            log.info("Nightly routine skipped: paused")
             return
         try:
+            await self.loop.run_in_executor(None, tables.refresh)
             await self.run_close()
+            due = self.game.due_round(datetime.now(ZONE).date())
+            if due:
+                await self.announce_round(self.game.open_round(due["key"]))
         except Exception:
-            log.exception("Market close failed")
+            log.exception("Nightly routine failed")
 
-    @market_close.before_loop
+    @nightly.before_loop
     async def _wait_until_ready(self) -> None:
         await self.wait_until_ready()
+        due = self.game.due_round(datetime.now(ZONE).date())   # catch up if the bot was off when a round opened
+        if due:
+            await self.announce_round(self.game.open_round(due["key"]))
 
 
 def run() -> None:

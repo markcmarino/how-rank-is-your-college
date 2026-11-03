@@ -21,7 +21,7 @@ the realities of AI in higher education come to absurd fruition. As administrato
 students, staff and faculty they write Secret Diaries about living under those policies. Every university \
 trades as a stock on the UnderAcademy Exchange and competes in the Big Digit Conference.
 
-Your job: decide what the policies, diary evidence and challenge answers do to the university. Be funny in \
+Your job: decide what the policies and diary evidence do to the university. Be funny in \
 the deadpan voice of a financial wire service crossed with a campus newspaper. Consequences should follow \
 the logic of the policy to an absurd but recognizable extreme: good intentions, bad outcomes, unintended \
 side effects, and collisions between the school's own policies. Call back to older policies when they \
@@ -62,12 +62,6 @@ TOOL = {
                 "properties": {"effects": EFFECTS_SCHEMA, "consequence": {"type": "string"}},
                 "required": ["effects", "consequence"],
             },
-            "challenge": {
-                "type": "object",
-                "description": "Only if a challenge answer was listed: the consequence of that answer.",
-                "properties": {"effects": EFFECTS_SCHEMA, "consequence": {"type": "string"}},
-                "required": ["effects", "consequence"],
-            },
         },
         "required": ["policies"],
     },
@@ -93,8 +87,7 @@ def _clamp(effects: dict, limit: float, lawsuit_limit: float) -> dict:
 
 
 async def interpret_school(school: dict, stats: dict, register: list[dict], new_policy_ids: list[int],
-                           diaries: list[dict], challenge: dict | None, answer: str | None,
-                           tuning: dict) -> AIResults:
+                           diaries: list[dict], current_round: dict | None, tuning: dict) -> AIResults:
     """Asks Claude about one school. Returns an empty AIResults on any failure."""
     results = AIResults()
     limits = tuning["ai_limits"]
@@ -104,8 +97,7 @@ async def interpret_school(school: dict, stats: dict, register: list[dict], new_
         "policy_register": register,
         "new_policy_ids": new_policy_ids,
         "new_secret_diary_entries": diaries,
-        "current_round_challenge": challenge,
-        "challenge_answer": answer,
+        "current_round": current_round,
     }
     try:
         reply = await _client().messages.create(
@@ -132,10 +124,6 @@ async def interpret_school(school: dict, stats: dict, register: list[dict], new_
         d = data["diaries"]
         results.diaries[school["id"]] = Interpretation(
             _clamp(d.get("effects"), limits["diaries"], limits["lawsuits_per_policy"]), d["consequence"])
-    if answer and data.get("challenge", {}).get("consequence"):
-        c = data["challenge"]
-        results.responses[school["id"]] = Interpretation(
-            _clamp(c.get("effects"), limits["per_policy"], limits["lawsuits_per_policy"]), c["consequence"])
     return results
 
 

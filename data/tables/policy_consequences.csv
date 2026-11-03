@@ -1,0 +1,100 @@
+Domain,Round,Text
+Admissions,Any,"Following the passage of {policy}, applications to {school} doubled overnight. Half were written by the same chatbot."
+Admissions,Any,{rival} has quietly copied {policy} and is now claiming it was their idea.
+Admissions,Any,Admissions officers report that {policy} has made essays 40 percent more confident and 90 percent less true.
+Admissions,Any,A prospective student heard about {policy} on a campus tour and applied on the spot. Their parents are suing.
+Admissions,Any,{department} has formally asked what {policy} means. No one has answered.
+Admissions,Any,"Under {policy}, the admissions office now admits applicants in the order their chatbots finish typing."
+Admissions,Any,"{policy} has produced the first incoming class in which every student lists ""prompt engineering"" as a hobby."
+Admissions,Any,"AI Corpone has praised {policy} as ""very on brand."" Admissions is unsure whose brand."
+Admissions,Any,"Thanks to {policy}, the waitlist at {school} is now longer than the campus."
+Admissions,Any,A legacy applicant was rejected under {policy}. His grandfather's portrait has been turned to face the wall.
+Admissions,Any,The campus tour now includes a stop explaining {policy}. Tour guides walk faster at that stop.
+Teaching,Any,"Since {policy} took effect, attendance is up 300 percent. It is unclear how many attendees are human."
+Teaching,Any,Faculty responded to {policy} by forming a committee to study forming a committee.
+Teaching,Any,{policy} has produced the first syllabus in history that is longer than the course.
+Teaching,Any,"Students praise {policy} in their course evaluations, which were also written under {policy}."
+Teaching,Any,{department} has filed a grievance about {policy} using a template it found at {rival}.
+Teaching,Any,"Under {policy}, the median grade at {school} is now ""Very Interesting."""
+Teaching,Any,"A professor tried to explain {policy} to her class. The class summarized her explanation and returned it to her, improved."
+Teaching,Any,Midterm averages rose sharply after {policy}. So did the price of the answer key on the dark web.
+Teaching,Any,"Thanks to {policy}, lectures now come in three lengths: short, shorter, and ""vibes only."""
+Teaching,Any,The Writing Center reports that {policy} has generated a record number of essays and a record low number of writers.
+Teaching,Any,"Under {policy}, office hours are now held by a chatbot that only says ""Great question!"""
+Research,Any,"{policy} yielded 1,400 papers this week. Reviewers are reviewing them with the same model that wrote them."
+Research,Any,"A grant agency praised {policy} in a press release, then rescinded the press release."
+Research,Any,"Energized by {policy}, a lab at {school} has discovered a new element. It is mostly marketing."
+Research,Any,"{rival} has cited {policy} as both a cautionary tale and a best practice, in the same paragraph."
+Research,Any,The {mascot} statue has been listed as co-author on three papers under {policy}.
+Research,Any,"Under {policy}, every dissertation at {school} now has the same acknowledgments section, thanking AI Corpone."
+Research,Any,"A research team used {policy} to prove that {policy} works. Peer reviewers called this ""bold."""
+Research,Any,{policy} has made {school} a world leader in a field nobody can name.
+Research,Any,The library reports that {policy} has filled the institutional repository with papers that cite each other in a perfect circle.
+Research,Any,"Federal auditors would like to discuss {policy}. They have brought snacks, which is a bad sign."
+Student Life,Any,{policy} has been widely celebrated with a party that {department} says it did not authorize.
+Student Life,Any,Students have formed a club devoted to {policy} and a rival club devoted to ignoring it.
+Student Life,Any,"Since {policy}, the dorms have been quieter. Too quiet. The roommates are all assistants now."
+Student Life,Any,A TikTok explaining {policy} has more views than {school} has ever had applicants.
+Student Life,Any,"{policy} has led, somehow, to a black market in vending machine snacks."
+Student Life,Any,"Under {policy}, the dining hall now recommends meals based on your browsing history. Today it recommended an apology."
+Student Life,Any,Residence advisors report that {policy} has reduced noise complaints by teaching the walls to complain first.
+Student Life,Any,"Thanks to {policy}, student government elections were won by a write-in candidate named Clippy."
+Student Life,Any,Students protesting {policy} were offered free AI tutoring. Several have since forgotten what they were protesting.
+Student Life,Any,The student newspaper ran a 12-part series on {policy}. Every part was a correction to the previous part.
+Athletics,Any,"Under {policy}, the {mascot}s won by 63 points. The opposing team has requested an audit."
+Athletics,Any,The coach credits {policy} for a perfect season of simulated games.
+Athletics,Any,{policy} allowed {school} to recruit a quarterback who is technically a server rack.
+Athletics,Any,"{rival} has filed a protest over {policy}. The conference forwarded it to a chatbot, which sided with both teams."
+Athletics,Any,Boosters love {policy}. They have asked that it be engraved on a new stadium.
+Athletics,Any,"Thanks to {policy}, the {mascot} mascot costume now gives post-game interviews."
+Athletics,Any,"Under {policy}, the band plays a fight song generated in real time. It is mostly about rights management."
+Athletics,Any,The Big Digit Conference has opened an investigation into {policy}. {school} has been asked to bring its algorithm.
+Athletics,Any,"Season ticket sales jumped after {policy}. Attendance did not, because the games are now streamed to the fans' fridges."
+Facilities,Any,{policy} replaced every water fountain with a rapid-charge station. Students report being thirsty but fully charged.
+Facilities,Any,The new building required by {policy} is 80 percent complete and 0 percent understood.
+Facilities,Any,{department} reports that {policy} has caused the elevators to unionize.
+Facilities,Any,"Following {policy}, the campus map has been updated 41 times today."
+Facilities,Any,Facilities would like to remind everyone that {policy} did not include a budget.
+Facilities,Any,"Under {policy}, the sprinklers now run on a predictive schedule. They predicted commencement."
+Facilities,Any,"Thanks to {policy}, the library is quieter than ever, because there are no longer any books in it."
+Facilities,Any,"The cooling towers installed under {policy} have made {school} the warmest campus in the conference, in every sense."
+Facilities,Any,Security cameras installed under {policy} have identified a suspicious individual on campus. It is the president.
+Facilities,Any,The parking office used {policy} to create 400 new spaces. They are all for drones.
+Finance,Any,{policy} has raised the endowment and the eyebrows of state auditors.
+Finance,Any,"Tuition is unchanged under {policy}, but there is now a fee for asking about tuition."
+Finance,Any,Investors cheered {policy} and immediately shorted {rival}.
+Finance,Any,{department} has been sold to a hedge fund as a consequence of {policy}. It was going to happen anyway.
+Finance,Any,"{policy} generated a surplus, which was spent on a consultant to explain {policy}."
+Finance,Any,AI Corpone has offered to match every dollar raised under {policy} with a coupon.
+Finance,Any,"Under {policy}, financial aid is now awarded by an algorithm that rewards students who have already paid."
+Finance,Any,The bursar reports that {policy} is profitable on paper. The paper has been sold.
+Finance,Any,"Thanks to {policy}, {school} now accepts tuition in tokens, compute credits, and personal data."
+Finance,Any,"A donor withdrew a $40 million gift over {policy}, then gave $50 million after reading about it again."
+Faculty & Staff,Any,Faculty greeted {policy} with cautious optimism and a 90-page memo.
+Faculty & Staff,Any,Staff report that {policy} doubled their workload and halved their parking.
+Faculty & Staff,Any,{policy} has inspired three professors to retire and one chatbot to apply for tenure.
+Faculty & Staff,Any,{rival} is poaching faculty by promising they will never hear the words {policy} again.
+Faculty & Staff,Any,"{department} has adopted {policy} with enthusiasm, mostly by misunderstanding it."
+Faculty & Staff,Any,"Under {policy}, annual reviews are now conducted by a MentorBot that can raise or lower salaries. Mostly lower."
+Faculty & Staff,Any,The faculty senate voted against {policy}. The vote was counted by {policy}.
+Faculty & Staff,Any,"Thanks to {policy}, the department chair's job has been optimized into a dropdown menu."
+Faculty & Staff,Any,Adjunct faculty say {policy} has changed nothing. They were already doing three jobs for the price of none.
+Faculty & Staff,Any,A groundskeeper followed {policy} exactly and planted a carpet of daffodils on the soccer field. Supervisors are pointing fingers.
+Any,Midterms,"The patch to {policy} has fixed the original problem and created four new ones, each with its own logo."
+Any,Midterms,"{school}'s amendment, {policy}, was described by the provost as ""a bandage on a bandage on a vibe."""
+Any,Midterms,"Under the amended {policy}, everything is the same, except now it is mandatory."
+Any,Midterms,"{rival} has filed a formal amendment to {school}'s amendment, {policy}. Nobody asked them."
+Any,Midterms,The midterm patch {policy} was rolled out to all students at once. Half of them got the old version.
+Any,Midterms,"AI Corpone has accepted {school}'s amendment, {policy}, on the condition that it be renamed after AI Corpone."
+Any,Finals,"The extreme measure {policy} took effect at midnight. By 12:03, {department} had stopped responding."
+Any,Finals,"{school} has invoked {policy}. Experts are calling it ""a lot."""
+Any,Finals,"Under {policy}, finals have been replaced by a single question. The question is ""Why?"""
+Any,Finals,{policy} has solved every problem caused by the amendments by removing the problems' ability to file complaints.
+Any,Finals,{rival} watched {school} adopt {policy} and has quietly locked its own doors.
+Any,Finals,Students learned of {policy} from an alert on their phones that also asked them to rate the alert.
+Any,Graduation,"During the commencement address, the line {policy} received a standing ovation from the robots and a sitting one from the parents."
+Any,Graduation,{school}'s graduation speech promised {policy}. Graduates were handed diplomas and a terms-of-service agreement.
+Any,Graduation,The commencement speaker said {policy} and paused for applause. The applause was generated.
+Any,Graduation,"Alumni who heard {policy} at graduation have begun requesting refunds, retroactively, with interest."
+Any,Graduation,The class of {school} threw their caps into the air after {policy}. Drones caught them and resold them.
+Any,Graduation,"{rival} has announced it will use {school}'s commencement line, {policy}, as a cautionary tale for its own graduates."

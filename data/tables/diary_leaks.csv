@@ -1,0 +1,9 @@
+Text,Stat,Low,High
+"A leaked diary entry from {character}, {role} at {school}, reads: ""{excerpt}"" Analysts called it ""concerning, but bullish.""",Satisfaction,-2,2
+"The Exchange obtained a diary entry from {character} ({role}): ""{excerpt}"" Shares moved in sympathy.",Prestige,-1,2
+"Sources close to {school} shared this from {character}, {role}: ""{excerpt}"" The administration declined to comment, then commented.",Morale,-2,2
+"An anonymous tip line received the following from {character} ({role}): ""{excerpt}"" Traders are reading between the lines.",Chaos,0,2
+"{character}, {role}, wrote in a Secret Diary: ""{excerpt}"" The entry has been shared 14,000 times, mostly by {rival}.",Prestige,-2,1
+"A diary entry by {character} ({role}) has surfaced: ""{excerpt}"" The board of trustees has asked for a summary of the summary.",Bureaucracy,0,1.5
+"From the Secret Diary of {character}, {role}: ""{excerpt}"" The Office of Student Wellness has scheduled a wellness meeting about it.",Satisfaction,-1,1.5
+"Leaked from {school}: {character} ({role}) writes ""{excerpt}"" Lawyers have begun highlighting things.",Lawsuits,0,0.3

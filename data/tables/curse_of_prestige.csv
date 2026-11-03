@@ -1,0 +1,21 @@
+Text,Prestige,Endowment,Enrollment,Satisfaction,Morale,Bureaucracy,Lawsuits,Chaos,Rival Stat,Rival Amount
+"{school}'s star dean has been poached by {rival}, along with her emotional support chatbot.",-1,,,,-0.5,,,,Prestige,0.4
+A billionaire has donated a building to {school} that nobody asked for. Upkeep begins immediately.,,-1,,,,0.3,,,,
+Applications to {school} tripled. The admissions office has walked out and taken the coffee maker.,,,-0.5,-0.6,,,,0.4,,
+A glowing magazine profile of {school} has prompted an investigation into everything in it.,-0.5,,,,,,0.15,,,
+The {mascot}s' coach has demanded a raise larger than the library budget. It was granted.,,-0.5,,,-1,,,,,
+{school} has been asked to host the Big Digit Conference summit. All of it. Indefinitely.,,-0.7,,,,0.5,,,,
+"AI Corpone has named {school} his favorite university, which is never good news.",-0.6,,,-0.4,,,0.1,,,
+{school}'s ranking has been printed on a tote bag. Faculty consider this the end of an era.,-0.3,,,,-0.8,,,,,
+The Office of Regression to the Mean has opened a satellite office on {school}'s campus.,-0.8,,,,,0.4,,,,
+"{school}'s success has attracted 4,000 consultants. They are all billing.",,-1,,,,,,0.3,,
+{rival} has hired away {school}'s entire IT department by promising them windows that open.,,,,,-0.6,,,0.5,Morale,0.5
+An alumnus has demanded his degree be revoked so he can brag about getting in again now.,-0.4,,,-0.5,,,,,,
+{school} trended worldwide for six hours. Nobody can agree what for.,-0.5,,,,,,,0.6,,
+AI Corpone has asked {school} to star in a commercial. The script calls for the president to wear a jetpack.,-0.7,0.3,,,,,,,,
+The rankings success went to {school}'s head. The president has commissioned a statue of the rankings.,,-0.8,,,-0.3,,,,,
+Every other university in the Big Digit Conference has formed a group chat about {school}. {school} is not in it.,-0.6,,,-0.3,,,,,,
+{school}'s servers were overwhelmed by applicants. The backup servers were the dorms.,,,,-0.8,,,,0.4,,
+"A prestigious award was given to {school} and then, after a recount by an AI, to {rival}.",-0.8,,,,,,,,Prestige,0.5
+"{school} has been featured in a documentary titled ""Too Big to Grade.""",-0.5,,,,,,0.1,,,
+The board of trustees has voted to rename {school} after its own ranking. The signage alone costs a fortune.,,-0.9,,,,0.3,,,,

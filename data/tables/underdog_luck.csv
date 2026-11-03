@@ -1,0 +1,19 @@
+Text,Prestige,Endowment,Enrollment,Satisfaction,Morale,Bureaucracy,Lawsuits,Chaos,Rival Stat,Rival Amount
+A TikTok about {school}'s cafeteria has gone viral. Nobody can agree whether it is praise.,0.3,,1,,,,,,,
+A disgraced Nobel laureate needed somewhere to land and chose {school}.,1,,,,,,0.1,,,
+"{school}'s low standards have been rebranded as ""radical access"" and won a grant.",0.3,1,,,,,,,,
+A scandal at {rival} has sent transfer students fleeing to {school}.,,,1,,,,,,Enrollment,-0.5
+A documentary crew mistook {school} for a scrappy upstart. The {mascot}s are playing along.,0.8,,,0.4,,,,,,
+An anonymous alum has left {school} a vineyard and a strongly worded letter.,,1,,0.4,,,,,,
+"{school}'s servers crashed during a hype cycle, so it is now known as the last human university.",0.7,,,,0.5,,,,,
+"AI Corpone forgot {school} exists, which analysts are calling its best quarter ever.",,,,0.8,,,,-0.5,,
+"{school}'s faculty, ignored by every ranking, have quietly done excellent work.",0.4,,,,1,,,,,
+A celebrity influencer enrolled at {school} by accident and has decided to stay.,0.4,,0.8,,,,,,,
+"{school}'s mascot, the {mascot}, has become a meme. Merchandise sales are up 900 percent.",,0.9,,0.3,,,,,,
+"A minor clerical error has listed {school} as ""selective."" Nobody is correcting it.",0.9,,,,,,,,,
+"{school} has been described as ""charming"" by a ranking algorithm that confused it with a bed and breakfast.",0.6,,0.5,,,,,,,
+"A rival's chatbot recommended {school} to 10,000 students by mistake.",,,1,,,,,,Enrollment,-0.3
+{school}'s one working printer has become a pilgrimage site.,0.3,,,0.7,,,,,,
+"A retired billionaire, tired of fancy schools, has adopted {school} as a hobby.",,1.1,,,,,,,,
+The faculty at {school} discovered that nobody is watching and have started teaching whatever they like. Students love it.,,,,0.8,0.6,,,,,
+{school} was too small to be included in AI Corpone's data breach.,,,,0.5,,,-0.2,,,
