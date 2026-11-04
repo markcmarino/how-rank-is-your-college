@@ -1,0 +1,23 @@
+{
+ "day": 1,
+ "round": "Round 2: Midterms",
+ "commentary": "A slow day on the Exchange. Even AI Corpone took a nap.",
+ "rankings": [
+  {
+   "rank": 1,
+   "name": "Tauk Tech U",
+   "hashtag": "TaukTechU",
+   "code": "TTU",
+   "price": 127.05,
+   "score": 50.82
+  },
+  {
+   "rank": 2,
+   "name": "University of the Cloud",
+   "hashtag": "UniversityoftheCloud",
+   "code": "UC",
+   "price": 126.65,
+   "score": 50.66
+  }
+ ]
+}
