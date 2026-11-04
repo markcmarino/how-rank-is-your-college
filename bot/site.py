@@ -25,8 +25,12 @@ CSS = """
 :root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf; }
 @media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17; } }
 * { box-sizing:border-box; }
-a { color:inherit; text-decoration-color:var(--rule); text-underline-offset:2px; }
-a:hover { color:var(--accent); text-decoration-color:currentColor; }
+a { color:var(--accent); text-underline-offset:2px; }
+a:hover { text-decoration-thickness:2px; }
+td a, .who a { font-weight:700; }
+.schools { border-bottom:1px solid var(--rule); padding:8px 0; font:14px/1.4 system-ui, sans-serif; }
+.schools summary { cursor:pointer; font-weight:700; color:var(--accent); }
+.schools div { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:6px 16px; padding-top:10px; }
 .masthead h1 a { text-decoration:none; color:inherit; }
 .days { display:flex; flex-wrap:wrap; gap:6px 14px; border-bottom:1px solid var(--rule); padding:8px 0;
   font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
@@ -183,6 +187,7 @@ def build(db, game) -> dict[str, str]:
                       f"""{dateline}
 <div class="ticker">{ticker or "<span>Markets closed</span>"}</div>
 {nav}
+{school_menu(prefix)}
 <section class="lead">{lead_html}</section>
 <div class="grid">
 <section><h3>The Rankings</h3><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
@@ -193,6 +198,11 @@ def build(db, game) -> dict[str, str]:
 <section><h3>Overheard in the Secret Diaries</h3>{diary_html}</section>
 <section><h3>From the Policy Register</h3>{register}</section>
 </div>""")
+
+    def school_menu(prefix: str) -> str:
+        links = "".join(f"<a href='{prefix}university/{quote(_slug(s))}.html'>{_e(s['name'])}</a>"
+                        for s in sorted(schools.values(), key=lambda s: s["name"].lower()))
+        return f"<details class='schools'><summary>All universities ({len(schools)})</summary><div>{links}</div></details>"
 
     round_names = {r["key"]: r["name"] for r in game.rounds()}
 
@@ -229,6 +239,7 @@ def build(db, game) -> dict[str, str]:
         return _shell(f"{school['name']} · US Snooze & Whirled Retort", tagline, "../index.html",
                       f"""{dateline}
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
+{school_menu("../")}
 <section class="lead"><h2>{_e(school['name'])}</h2>
 <p class="tag">#{_e(school['hashtag'])}</p>{standing}{f'<dl class="facts">{facts}</dl>' if facts else ''}</section>
 <section class="section"><h3>College Fair Pitch</h3><div class="body">{_e(parsing.pitch_text(school['pitch'])) or 'No pitch on file.'}</div></section>

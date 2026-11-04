@@ -176,6 +176,7 @@ def test_university_pages_keep_every_diary(tmp_path):
     assert front.count("<div") == front.count("</div>")   # the diary section is no longer cut off mid-entry
     section = front.split("Overheard in the Secret Diaries")[1].split("</section>")[0]
     assert section.count("class='story'") == 25           # one leak per university, none dropped
+    assert "All universities (25)" in front and "All universities (25)" in files["university/fernhillcollege.html"]
     assert "archive/day-1.html" in front and "university/grandprairiepolytechnic.html" in front
     assert "../university/grandprairiepolytechnic.html" in files["archive/day-2.html"]
     page = files["university/grandprairiepolytechnic.html"]
