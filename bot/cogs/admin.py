@@ -187,7 +187,7 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
     @app_commands.command(name="participation", description="Download a participation report for grading.")
     async def participation(self, interaction: discord.Interaction):
         data = self.bot.game.participation_csv().encode()
-        await interaction.response.send_message("Participation by player, post kind and round.",
+        await interaction.response.send_message("Participation, one row per player.",
                                                 file=discord.File(io.BytesIO(data), filename="participation.csv"),
                                                 ephemeral=True)
 

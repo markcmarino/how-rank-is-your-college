@@ -35,8 +35,8 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
 - **The finale**, whenever you like (including for groups playing out of season): `/admin vote open`, then
   `/admin vote close` to announce the people's champion (players can't vote for a university they posted for),
   or `/admin verdict` to crown a winner from the rankings after a randomized Final Audit.
-- **Grading:** `/admin participation` downloads a spreadsheet of every player's posts by kind and round, with
-  word counts and dates.
+- **Grading:** `/admin participation` downloads a spreadsheet with one row per player: total posts and words,
+  counts by kind and by round, and first and last post dates.
 - **Other tools:** `/admin decree` (a custom event, optionally moving a stat), `/admin strike TTU-3`,
   `/admin school` (fix a name, ticker or mascot), `/admin peek` (hidden stats), `/admin pause`,
   `/admin export` (*The Collected Statutes* and the price history), `/admin setup` (create missing channels).

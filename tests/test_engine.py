@@ -1,4 +1,6 @@
 import asyncio
+import csv
+import io
 import random
 
 from bot import parsing, site
@@ -123,8 +125,13 @@ def test_posting_flow(tmp_path):
     assert game.file_diary("#Ellen #groundskeeper #TaukTechU #round1\nDaffodils everywhere.", 2, "Ben", 107).ok
     bad = game.file_diary("#Ellen #groundskeeper #TaukTekU\nOops.", 2, "Ben", 108)
     assert not bad.ok and "Did you mean" in bad.message
-    csv_text = game.participation_csv()
-    assert "Ana" in csv_text and "Round 1: Welcome Week" in csv_text
+    rows = list(csv.DictReader(io.StringIO(game.participation_csv())))
+    assert sorted(r["Player"] for r in rows) == ["Ana", "Ben"]   # one row per player
+    ben = next(r for r in rows if r["Player"] == "Ben")
+    assert ben["Total posts"] == "3" and ben["Characters"] == "1" and ben["Policies"] == "1"
+    assert ben["Diaries"] == "1" and ben["Round 1: Welcome Week"] == "3"
+    ana = next(r for r in rows if r["Player"] == "Ana")
+    assert ana["Round 2: Midterms"] == "1" and ana["Universities"] == "Tauk Tech U"
 
 
 def test_close_site_and_finale(tmp_path):

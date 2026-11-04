@@ -352,16 +352,28 @@ class Game:
         self.db.save_stats(stats)
 
     def participation_csv(self) -> str:
-        """One row per player per kind of post per round, for grading."""
+        """One row per player, for a grade book: totals, posts by kind, and posts by round."""
+        kinds = ["pitch", "character", "policy", "diary"]
+        rounds = [r["key"] for r in self.rounds()]
+        players: dict[int, dict] = {}
+        for r in self.db.participation():
+            p = players.setdefault(r["user_id"], {"name": r["user_name"], "schools": set(), "posts": 0, "words": 0,
+                                                  "by": {}, "first": r["first_post"], "last": r["last_post"]})
+            p["schools"].add(r["university"])
+            p["posts"] += r["posts"]
+            p["words"] += r["words"] or 0
+            p["by"][r["kind"]] = p["by"].get(r["kind"], 0) + r["posts"]
+            p["by"][r["round"]] = p["by"].get(r["round"], 0) + r["posts"]
+            p["first"], p["last"] = min(p["first"], r["first_post"]), max(p["last"], r["last_post"])
         out = io.StringIO()
         writer = csv.writer(out)
-        writer.writerow(["Player", "Discord ID", "Universities", "Post kind", "Round", "Posts", "Words",
-                         "First post (UTC)", "Last post (UTC)"])
-        names = {r["key"]: r["name"] for r in self.rounds()}
-        for r in self.db.participation():
-            writer.writerow([r["user_name"], r["user_id"], r["universities"], r["kind"],
-                             names.get(r["round"], r["round"] or "Before Round 1"), r["posts"], r["words"],
-                             r["first_post"], r["last_post"]])
+        writer.writerow(["Player", "Universities", "Total posts", "Total words", "Pitches", "Characters", "Policies",
+                         "Diaries", "Before Round 1"] + [r["name"] for r in self.rounds()]
+                        + ["First post (UTC)", "Last post (UTC)", "Discord ID"])
+        for user_id, p in sorted(players.items(), key=lambda item: item[1]["name"].lower()):
+            writer.writerow([p["name"], "; ".join(sorted(s for s in p["schools"] if s)), p["posts"], p["words"]]
+                            + [p["by"].get(k, 0) for k in kinds] + [p["by"].get(None, 0)]
+                            + [p["by"].get(k, 0) for k in rounds] + [p["first"], p["last"], user_id])
         return out.getvalue()
 
     def export_statutes(self) -> str:

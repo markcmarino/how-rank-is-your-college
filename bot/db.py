@@ -278,10 +278,10 @@ class Database:
     def participation(self) -> list[sqlite3.Row]:
         return self.conn.execute(
             "SELECT p.user_id, MAX(p.user_name) AS user_name, "
-            "GROUP_CONCAT(DISTINCT s.name) AS universities, p.kind, p.round, COUNT(*) AS posts, "
+            "s.name AS university, p.kind, p.round, COUNT(*) AS posts, "
             "SUM(p.words) AS words, MIN(p.created_at) AS first_post, MAX(p.created_at) AS last_post "
             "FROM posts p LEFT JOIN schools s ON s.id = p.school_id "
-            "GROUP BY p.user_id, p.kind, p.round ORDER BY user_name").fetchall()
+            "GROUP BY p.user_id, p.school_id, p.kind, p.round ORDER BY user_name").fetchall()
 
     # ---- votes ---------------------------------------------------------
     def cast_vote(self, user_id: int, user_name: str, school_id: int) -> None:
