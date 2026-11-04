@@ -9,7 +9,7 @@ import random
 from dataclasses import dataclass, field
 from datetime import date
 
-from . import ai, parsing, reports
+from . import ai, config, parsing, reports
 from .db import Database
 from .engine import (AIResults, Diary, DayResult, NewPolicy, School, final_audit, load_data, run_day,
                      starting_stats)
@@ -162,7 +162,7 @@ class Game:
         if suggestion:
             return Filed(False, f"{what} I couldn't find that university. Did you mean **#{suggestion}**?")
         return Filed(False, f"{what} I couldn't find a university hashtag. New universities register with a post "
-                            f"in the College Fair Pitches channel first.")
+                            f"in #{config.CHANNELS['fair']} first.")
 
     def file_policy(self, content: str, user_id: int, user_name: str, message_id: int) -> Filed:
         tags, body = parsing.leading_tags(content)
