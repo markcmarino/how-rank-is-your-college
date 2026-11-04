@@ -232,7 +232,7 @@ def build(db, game) -> dict[str, str]:
 <section class="lead"><h2>{_e(school['name'])}</h2>
 <p class="tag">#{_e(school['hashtag'])}</p>{standing}{f'<dl class="facts">{facts}</dl>' if facts else ''}</section>
 <section class="section"><h3>College Fair Pitch</h3><div class="body">{_e(parsing.pitch_text(school['pitch'])) or 'No pitch on file.'}</div></section>
-<section class="section"><h3>Cast of Characters</h3>{characters or '<p>No one has come forward.</p>'}</section>
+<section class="section"><h3>College Characters</h3>{characters or '<p>No one has come forward.</p>'}</section>
 <div class="grid">
 <section><h3>Secret Diaries</h3>{diaries or '<p>The diaries are quiet.</p>'}</section>
 <section><h3>Policies</h3>{policies or '<p>No policies yet.</p>'}</section>
