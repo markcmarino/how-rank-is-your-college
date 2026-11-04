@@ -78,8 +78,10 @@ class RankBot(commands.Bot):
 
     async def announce_round(self, rnd: dict | None) -> None:
         if rnd:
+            policies = self.channel("policies")
+            where = policies.mention if policies else f"#{config.CHANNELS['policies']}"
             await self.post("announcements", f"📯 **{rnd['name']} begins!**\n\n"
-                                             f"**Administrators:** {rnd['institutional']}\n\n"
+                                             f"**Administrators:** {rnd['institutional']} Post it in {where}.\n\n"
                                              f"**Characters:** {rnd['character']}\n\n"
                                              f"_Catching up on an earlier round? Add its tag, like #round1, "
                                              f"to your post._")
