@@ -308,6 +308,11 @@ class Database:
         return self.conn.execute("SELECT * FROM events WHERE day = ? AND school_id = ? ORDER BY id",
                                  (day, school_id)).fetchall()
 
+    def school_events(self, school_id: int) -> list[sqlite3.Row]:
+        """Everything that has happened to one university, newest first."""
+        return self.conn.execute("SELECT * FROM events WHERE school_id = ? ORDER BY day DESC, id DESC",
+                                 (school_id,)).fetchall()
+
     def save_snapshot(self, day: int, rows: list[dict]) -> None:
         self.conn.executemany(
             "INSERT OR REPLACE INTO snapshots(day, school_id, score, price, rank, stats_json) "

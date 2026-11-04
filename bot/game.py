@@ -119,7 +119,8 @@ class Game:
         fields = parsing.profile_fields(body)
         new = school is None
         if new:
-            similar = parsing.did_you_mean(tag, self.school_names())
+            # Stricter than the suggestions on other posts: real names often share a word like University
+            similar = parsing.did_you_mean(tag, self.school_names(), cutoff=0.8)
             if similar and parsing.squash(similar) != parsing.squash(tag) and "#new" not in content.lower():
                 return Filed(False, f"🎪 Did you mean **#{similar}**? If #{tag} really is a new university, "
                                     f"post again with `#new` at the end.")
@@ -390,8 +391,8 @@ class Game:
             if snap:
                 meta.append(f"**Final share price:** ${snap['price']:.2f} (rank {snap['rank']})")
             lines += meta + [""]
-            if s["pitch"]:
-                lines += ["### College Fair Pitch", s["pitch"], ""]
+            if parsing.pitch_text(s["pitch"]):
+                lines += ["### College Fair Pitch", parsing.pitch_text(s["pitch"]), ""]
             chars = db.characters(s["id"])
             if chars:
                 lines.append("### Characters")

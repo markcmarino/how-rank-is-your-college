@@ -7,6 +7,7 @@ from bot import parsing, site
 from bot.db import Database
 from bot.engine import AIResults, Interpretation, NewPolicy, School, load_data, run_day, starting_stats
 from bot.game import Game
+from scripts.simulate import NAMES
 
 
 def make_schools(n, data, rng):
@@ -154,6 +155,49 @@ def test_close_site_and_finale(tmp_path):
     snap = db.all_stats()
     assert abs(snap[late.school["id"]]["prestige"] - snap[db.find_school("TaukTechU")["id"]]["prestige"]) < 15
     assert "Collected Statutes" in game.export_statutes()
+
+
+def test_university_pages_keep_every_diary(tmp_path):
+    db, game = new_game(tmp_path, seed=3)
+    game.open_round("welcome")
+    tags = [name.replace(" ", "").replace("&", "") for name in NAMES]
+    for i, tag in enumerate(tags):
+        game.register_or_pitch(f"#{tag}\nA fine institution.\nMotto: Onward", i, f"RealName{i}", 1000 + i)
+    assert len(db.schools()) == 25                        # real names that share a word aren't taken for typos
+    game.commit(asyncio.run(game.close()))
+    for i, tag in enumerate(tags):
+        for who in range(3):
+            game.file_diary(f"#Pat{who} #student #{tag}\nEntry {who} from {tag}. " + "Long entry. " * 60, i,
+                            f"RealName{i}", 2000 + i * 10 + who)
+    game.file_policy(f"#{tags[0]} All lectures are given by robots.", 0, "RealName0", 5000)
+    game.commit(asyncio.run(game.close()))
+    files = site.build(db, game)
+    front = files["index.html"]
+    assert front.count("<div") == front.count("</div>")   # the diary section is no longer cut off mid-entry
+    section = front.split("Overheard in the Secret Diaries")[1].split("</section>")[0]
+    assert section.count("class='story'") == 25           # one leak per university, none dropped
+    assert "archive/day-1.html" in front and "university/grandprairiepolytechnic.html" in front
+    assert "../university/grandprairiepolytechnic.html" in files["archive/day-2.html"]
+    page = files["university/grandprairiepolytechnic.html"]
+    assert all(f"Entry {who} from GrandPrairiePolytechnic" in page for who in range(3))
+    assert page.index("Entry 2 from") < page.index("Entry 0 from")   # newest first
+    assert "All lectures are given by robots." in page and "Onward" in page and "Motto: Onward" not in page
+    assert not any("RealName" in text for text in files.values())    # Discord names stay private
+
+
+def test_publish_is_one_commit(monkeypatch):
+    calls = []
+
+    def fake_api(method, path, body=None):
+        calls.append((method, path))
+        return {"object": {"sha": "head"}, "tree": {"sha": "base"}, "sha": "new"}
+    monkeypatch.setattr(site, "_api", fake_api)
+    monkeypatch.setattr(site.config, "SITE_GITHUB_TOKEN", "token")
+    monkeypatch.setattr(site.config, "SITE_REPO", "someone/somerepo")
+    url = site.publish({"index.html": "a", "university/x.html": "b"})
+    assert url == "https://someone.github.io/somerepo/"
+    assert [c for c in calls if c[0] != "GET"] == [("POST", "/git/trees"), ("POST", "/git/commits"),
+                                                   ("PATCH", "/git/refs/heads/" + site.config.SITE_BRANCH)]
 
 
 def test_due_round(tmp_path):

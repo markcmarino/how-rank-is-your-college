@@ -102,6 +102,12 @@ def profile_fields(text: str) -> dict:
     return out
 
 
+def pitch_text(text: str) -> str:
+    """A pitch without its Name:, Mascot: and similar lines, which are shown separately."""
+    lines = [line for line in (text or "").split("\n") if not FIELD.match(line)]
+    return "\n".join(lines).strip()
+
+
 def policy_kind(tags: list[str]) -> str | None:
     for tag in tags:
         kind = KIND_TAGS.get(squash(tag))
@@ -148,8 +154,8 @@ def title_for(text: str, limit: int = 70) -> str:
     return first[:limit].rsplit(" ", 1)[0] + "..."
 
 
-def did_you_mean(tag: str, known: list[str]) -> str | None:
+def did_you_mean(tag: str, known: list[str], cutoff: float = 0.6) -> str | None:
     """known: the hashtags (as written) of registered universities."""
     by_key = {squash(k): k for k in known}
-    match = difflib.get_close_matches(squash(tag), list(by_key), n=1, cutoff=0.6)
+    match = difflib.get_close_matches(squash(tag), list(by_key), n=1, cutoff=cutoff)
     return by_key[match[0]] if match else None
