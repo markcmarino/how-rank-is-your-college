@@ -37,6 +37,10 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
   or `/admin verdict` to crown a winner from the rankings after a randomized Final Audit.
 - **Grading:** `/admin participation` downloads a spreadsheet with one row per player: total posts and words,
   counts by kind and by round, and first and last post dates.
+- **Backups:** the bot saves a dated copy of the database in a `backups` folder beside it each night and keeps two
+  weeks of them. `/admin backup` sends you a copy privately in Discord.
+- **If the bot restarts:** it files anything posted while it was away, using the time each post was made, and rings a
+  closing bell it missed at midnight.
 - **Other tools:** `/admin decree` (a custom event, optionally moving a stat), `/admin strike TTU-3`,
   `/admin school` (fix a name, ticker or mascot), `/admin peek` (hidden stats), `/admin pause`,
   `/admin export` (*The Collected Statutes* and the price history), `/admin setup` (create missing channels).

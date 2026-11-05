@@ -2,8 +2,11 @@ import asyncio
 import csv
 import io
 import random
+from datetime import datetime, timezone
+from types import SimpleNamespace
 
-from bot import parsing, site
+from bot import config, parsing, site
+from bot.cogs.posts import Posts
 from bot.db import Database
 from bot.engine import AIResults, Interpretation, NewPolicy, School, load_data, run_day, starting_stats
 from bot.game import Game
@@ -199,6 +202,94 @@ def test_publish_is_one_commit(monkeypatch):
     assert url == "https://someone.github.io/somerepo/"
     assert [c for c in calls if c[0] != "GET"] == [("POST", "/git/trees"), ("POST", "/git/commits"),
                                                    ("PATCH", "/git/refs/heads/" + site.config.SITE_BRANCH)]
+
+
+def test_character_named_like_a_ticker_stays_with_their_university(tmp_path):
+    db, game = new_game(tmp_path)
+    game.open_round("welcome")
+    game.register_or_pitch("#TaukTechU\nA pitch.", 1, "Ana", 1)
+    cloud = game.register_or_pitch("#UniversityoftheCloud\nA pitch.", 2, "Ben", 2)
+    assert cloud.school["code"] == "UC" and "Name:" in cloud.message
+    filed = game.file_diary("#Uc #dean #TaukTechU\nDear diary.", 1, "Ana", 3)
+    assert filed.ok and filed.school["code"] == "TTU"
+    assert db.diaries(filed.school["id"])[0]["character"] == "Uc"
+    assert game.file_policy("#UC Dreams are tuition.", 2, "Ben", 4).school["code"] == "UC"   # a ticker alone still works
+
+
+def test_late_posts_count_for_the_round_they_were_posted_in(tmp_path):
+    db, game = new_game(tmp_path)
+    game.open_round("welcome")
+    db.set("round_opened_welcome", "2026-11-09T08:00:00+00:00")
+    game.open_round("midterms")
+    db.set("round_opened_midterms", "2026-11-13T08:00:00+00:00")
+    game.register_or_pitch("#TaukTechU\nA pitch.", 1, "Ana", 1, datetime(2026, 11, 10, tzinfo=timezone.utc))
+    assert game.file_diary("#Ellen #groundskeeper #TaukTechU\nLate entry.", 1, "Ana", 2,
+                           datetime(2026, 11, 12, 23, 59, tzinfo=timezone.utc)).ok
+    assert db.diaries()[0]["round"] == "welcome"
+    row = next(csv.DictReader(io.StringIO(game.participation_csv())))
+    assert row["Round 1: Welcome Week"] == "2" and row["Last post (UTC)"].startswith("2026-11-12T23:59")
+
+
+class FakeMessage:
+    def __init__(self, id, content, channel):
+        self.id, self.content, self.channel = id, content, channel
+        self.author = SimpleNamespace(bot=False, id=1, display_name="Ana")
+        self.guild = True
+        self.created_at = datetime(2026, 11, 10, tzinfo=timezone.utc)
+        self.reactions, self.replies = [], []
+
+    async def add_reaction(self, emoji):
+        self.reactions.append(emoji)
+
+    async def reply(self, text, mention_author=False):
+        self.replies.append(text)
+
+
+class FakeChannel:
+    def __init__(self, id, name):
+        self.id, self.name, self.messages = id, name, []
+
+    async def history(self, after, oldest_first, limit):
+        for message in self.messages:
+            if message.id > after.id:
+                yield message
+
+
+def test_catch_up_files_missed_posts_once_and_skips_old_ones(tmp_path):
+    db, game = new_game(tmp_path)
+    game.open_round("welcome")
+    posted = []
+
+    async def post(key, text):
+        posted.append(text)
+
+    pitches = FakeChannel(10, config.CHANNELS["fair"])
+
+    async def active_threads():
+        return []
+    guild = SimpleNamespace(text_channels=[pitches], active_threads=active_threads)
+    bot = SimpleNamespace(db=db, game=game, post=post, home_guild=lambda: guild)
+    cog = Posts(bot)
+    old = FakeMessage(5, "#OldTestSchool\nFrom before the game.", pitches)
+    pitches.messages = [old]
+    asyncio.run(cog.catch_up())                     # first look: note the position, file nothing old
+    assert db.schools() == [] and old.reactions == []
+    db.set(f"seen_{pitches.id}", 6)
+    missed = FakeMessage(7, "#TaukTechU\nPosted while the bot was away.", pitches)
+    typo = FakeMessage(8, "", pitches)
+    pitches.messages = [old, missed, typo]
+    asyncio.run(cog.catch_up())
+    asyncio.run(cog.catch_up())                     # running it again changes nothing
+    assert [s["hashtag"] for s in db.schools()] == ["TaukTechU"]
+    assert len(missed.reactions) == 1 and len(missed.replies) == 1 and len(posted) == 1
+    assert int(db.get(f"seen_{pitches.id}")) == 7
+
+
+def test_backup_is_a_working_copy(tmp_path):
+    db, game = new_game(tmp_path)
+    game.register_or_pitch("#TaukTechU\nA pitch.", 1, "Ana", 1)
+    db.backup_to(tmp_path / "copy.db")
+    assert Database(tmp_path / "copy.db").find_school("TaukTechU")["name"] == "Tauk Tech U"
 
 
 def test_due_round(tmp_path):

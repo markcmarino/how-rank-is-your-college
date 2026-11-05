@@ -156,13 +156,13 @@ class Database:
     def school(self, school_id: int) -> sqlite3.Row | None:
         return self.conn.execute("SELECT * FROM schools WHERE id = ?", (school_id,)).fetchone()
 
-    def find_school(self, text: str) -> sqlite3.Row | None:
+    def find_school(self, text: str, tickers: bool = True) -> sqlite3.Row | None:
         """Match by hashtag, ticker or full name, ignoring case, spaces and a leading #."""
         key = squash(text)
         if not key:
             return None
         for row in self.schools():
-            if key in (row["tag_key"], squash(row["code"]), squash(row["name"])):
+            if key in (row["tag_key"], squash(row["name"])) or (tickers and key == squash(row["code"])):
                 return row
         return None
 
@@ -265,15 +265,23 @@ class Database:
         self.conn.executemany(f"UPDATE {table} SET processed = 1 WHERE id = ?", [(i,) for i in ids])
         self.conn.commit()
 
+    def backup_to(self, path: Path | str) -> None:
+        """Writes a safe copy of the database, even while the game is running."""
+        target = sqlite3.connect(path)
+        try:
+            self.conn.backup(target)
+        finally:
+            target.close()
+
     def already_filed(self, message_id: int) -> bool:
         return self.conn.execute("SELECT 1 FROM posts WHERE message_id = ?", (message_id,)).fetchone() is not None
 
     # ---- participation -------------------------------------------------
     def add_post(self, user_id: int, user_name: str, school_id: int | None, kind: str, round_key: str | None,
-                 words: int, message_id: int | None) -> None:
+                 words: int, message_id: int | None, posted_at: str | None = None) -> None:
         self._run("INSERT OR IGNORE INTO posts(user_id, user_name, school_id, kind, round, words, message_id, "
                   "created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                  (user_id, user_name, school_id, kind, round_key, words, message_id, now()))
+                  (user_id, user_name, school_id, kind, round_key, words, message_id, posted_at or now()))
 
     def participation(self) -> list[sqlite3.Row]:
         return self.conn.execute(

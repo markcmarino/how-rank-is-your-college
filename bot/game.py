@@ -7,12 +7,17 @@ import io
 import json
 import random
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 
 from . import ai, config, parsing, reports
-from .db import Database
+from .db import Database, now
 from .engine import (AIResults, Diary, DayResult, NewPolicy, School, final_audit, load_data, run_day,
                      starting_stats)
+
+
+def _stamp(moment: datetime | None) -> str | None:
+    """A post's time in the same form the database uses."""
+    return moment.isoformat(timespec="seconds") if moment else None
 
 
 @dataclass
@@ -90,6 +95,7 @@ class Game:
 
     def open_round(self, key: str) -> dict | None:
         self.db.set("round", key)
+        self.db.set(f"round_opened_{key}", now())
         return self.current_round()
 
     def new_school_stats(self) -> dict:
@@ -108,7 +114,8 @@ class Game:
         return [s["hashtag"] for s in self.db.schools()]
 
     # ---- filing posts ----------------------------------------------------------
-    def register_or_pitch(self, content: str, user_id: int, user_name: str, message_id: int) -> Filed:
+    def register_or_pitch(self, content: str, user_id: int, user_name: str, message_id: int,
+                          posted_at: datetime | None = None) -> Filed:
         """A post in College Fair Pitches. The first post with a new hashtag registers the university."""
         db = self.db
         tags, body = parsing.leading_tags(content)
@@ -136,22 +143,32 @@ class Game:
             pitch = ((school["pitch"] or "") + "\n\n" + body).strip()
             db.update_school(school_id, pitch=pitch, **updates)
         db.add_member(user_id, school_id, user_name)
-        db.add_post(user_id, user_name, school_id, "pitch", self._round_key(), len(body.split()), message_id)
+        db.add_post(user_id, user_name, school_id, "pitch", self._round_key(posted_at), len(body.split()), message_id,
+                    _stamp(posted_at))
         school = db.school(school_id)
         if new:
             return Filed(True, f"🏛️ **{school['name']}** is now listed on the UnderAcademy Exchange as "
-                               f"**{school['code']}**. Use **#{school['hashtag']}** on all your posts.", school, True)
+                               f"**{school['code']}**. Use **#{school['hashtag']}** on all your posts. If the name "
+                               f"looks wrong, post your hashtag again with a line like `Name: Tauk Tech University`.",
+                          school, True)
         return Filed(True, "", school)
 
     def _school_from_tags(self, tags: list[str]) -> tuple[object, list[str], str | None]:
         """Finds the university among a post's hashtags. Returns (school, other tags, did-you-mean suggestion)."""
         school, others, suggestion = None, [], None
+        # Hashtags and names come first, so a character called #Uc isn't mistaken for the ticker UC
         for tag in tags:
-            match = self.db.find_school(tag)
+            match = self.db.find_school(tag, tickers=False)
             if match and school is None:
                 school = match
             else:
                 others.append(tag)
+        if school is None:
+            for tag in others:
+                school = self.db.find_school(tag)
+                if school:
+                    others.remove(tag)
+                    break
         if school is None:
             for tag in others:
                 if parsing.policy_kind([tag]) or parsing.round_tag([tag], self.rounds()):
@@ -165,29 +182,32 @@ class Game:
         return Filed(False, f"{what} I couldn't find a university hashtag. New universities register with a post "
                             f"in #{config.CHANNELS['fair']} first.")
 
-    def file_policy(self, content: str, user_id: int, user_name: str, message_id: int) -> Filed:
+    def file_policy(self, content: str, user_id: int, user_name: str, message_id: int,
+                    posted_at: datetime | None = None) -> Filed:
         tags, body = parsing.leading_tags(content)
         school, others, suggestion = self._school_from_tags(tags)
         if school is None:
             return self._unknown(suggestion, "📜")
         if not body:
             return Filed(False, "📜 I found the hashtag but no policy text. Write the policy after the hashtag.")
-        rnd = self._round_for(others)
+        rnd = self._round_for(others, posted_at)
         kind = parsing.policy_kind(others) or (rnd["policy_kind"] if rnd else "Policy")
         domain = parsing.classify(body, self.data()["domains"])
         key = rnd["key"] if rnd else None
         policy = self.db.add_policy(school["id"], kind, parsing.title_for(body), body, domain,
                                     key, user_id, user_name, message_id)
         self.db.add_member(user_id, school["id"], user_name)
-        self.db.add_post(user_id, user_name, school["id"], "policy", key, len(body.split()), message_id)
+        self.db.add_post(user_id, user_name, school["id"], "policy", key, len(body.split()), message_id,
+                         _stamp(posted_at))
         return Filed(True, f"{school['code']}-{policy['number']}", school)
 
-    def file_character(self, content: str, user_id: int, user_name: str, message_id: int) -> Filed:
+    def file_character(self, content: str, user_id: int, user_name: str, message_id: int,
+                       posted_at: datetime | None = None) -> Filed:
         tags, body = parsing.leading_tags(content)
         school, others, suggestion = self._school_from_tags(tags)
         if school is None:
             return self._unknown(suggestion, "👋")
-        rnd = self._round_for(others)
+        rnd = self._round_for(others, posted_at)
         others = self._strip_tags(others)
         if not others:
             return Filed(False, "👋 Start with `#charactername #role #universityname`.")
@@ -195,15 +215,16 @@ class Game:
                               user_id, user_name, message_id)
         self.db.add_member(user_id, school["id"], user_name)
         self.db.add_post(user_id, user_name, school["id"], "character", rnd["key"] if rnd else None,
-                         len(body.split()), message_id)
+                         len(body.split()), message_id, _stamp(posted_at))
         return Filed(True, "", school)
 
-    def file_diary(self, content: str, user_id: int, user_name: str, message_id: int) -> Filed:
+    def file_diary(self, content: str, user_id: int, user_name: str, message_id: int,
+                   posted_at: datetime | None = None) -> Filed:
         tags, body = parsing.leading_tags(content)
         school, others, suggestion = self._school_from_tags(tags)
         if school is None:
             return self._unknown(suggestion, "📓")
-        rnd = self._round_for(others)
+        rnd = self._round_for(others, posted_at)
         others = self._strip_tags(others)
         if not others or not body:
             return Filed(False, "📓 Start your entry with `#charactername #role #universityname`, then write it.")
@@ -211,19 +232,32 @@ class Game:
         self.db.add_diary(school["id"], others[0], others[1] if len(others) > 1 else "", body, key,
                           user_id, user_name, message_id)
         self.db.add_member(user_id, school["id"], user_name)
-        self.db.add_post(user_id, user_name, school["id"], "diary", key, len(body.split()), message_id)
+        self.db.add_post(user_id, user_name, school["id"], "diary", key, len(body.split()), message_id,
+                         _stamp(posted_at))
         return Filed(True, "", school)
 
-    def _round_for(self, tags: list[str]) -> dict | None:
-        """A catch-up round tag on the post, or else the current round."""
-        return parsing.round_tag(tags, self.rounds()) or self.current_round()
+    def _round_for(self, tags: list[str], posted_at: datetime | None = None) -> dict | None:
+        """A catch-up round tag on the post, or else the round open when it was posted."""
+        return parsing.round_tag(tags, self.rounds()) or self._round_at(posted_at)
+
+    def _round_at(self, posted_at: datetime | None) -> dict | None:
+        """The round open at a moment. Matters for posts filed late, after the bot was away."""
+        opened = {r["key"]: self.db.get(f"round_opened_{r['key']}") for r in self.rounds()}
+        opened = {key: stamp for key, stamp in opened.items() if stamp}
+        if posted_at is None or not opened:
+            return self.current_round()
+        earlier = [key for key, stamp in opened.items() if stamp <= _stamp(posted_at)]
+        if not earlier:
+            return None
+        latest = max(earlier, key=opened.get)
+        return next(r for r in self.rounds() if r["key"] == latest)
 
     def _strip_tags(self, tags: list[str]) -> list[str]:
         """Drops round and kind tags, leaving #charactername #role."""
         return [t for t in tags if not parsing.round_tag([t], self.rounds()) and not parsing.policy_kind([t])]
 
-    def _round_key(self) -> str | None:
-        rnd = self.current_round()
+    def _round_key(self, posted_at: datetime | None = None) -> str | None:
+        rnd = self._round_at(posted_at)
         return rnd["key"] if rnd else None
 
     # ---- the market close ------------------------------------------------

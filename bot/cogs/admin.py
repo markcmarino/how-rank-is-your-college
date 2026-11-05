@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import io
+import tempfile
+from pathlib import Path
 
 import discord
 from discord import app_commands
@@ -190,6 +192,18 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
         await interaction.response.send_message("Participation, one row per player.",
                                                 file=discord.File(io.BytesIO(data), filename="participation.csv"),
                                                 ephemeral=True)
+
+    @app_commands.command(name="backup", description="Download a safe copy of the game's database.")
+    async def backup(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / f"{config.DB_PATH.stem}-backup.db"
+            self.bot.db.backup_to(path)
+            if path.stat().st_size > 8_000_000:
+                return await interaction.followup.send("The database is too large to send through Discord. Download "
+                                                       "it from the host's backups folder instead.", ephemeral=True)
+            await interaction.followup.send("Here's a copy of the database. It holds players' Discord IDs, so keep "
+                                            "it private.", file=discord.File(path), ephemeral=True)
 
     @app_commands.command(name="export", description="Download the Collected Statutes and price history.")
     async def export(self, interaction: discord.Interaction):

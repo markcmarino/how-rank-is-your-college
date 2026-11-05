@@ -43,6 +43,7 @@ class RankBot(commands.Bot):
 
     async def on_ready(self) -> None:
         log.info("Logged in as %s; closing bell daily at %s %s", self.user, NIGHTLY, config.TIMEZONE)
+        await self.get_cog("Posts").catch_up()   # also runs after a reconnect, which can miss posts too
 
     # ---- helpers ---------------------------------------------------------
     def home_guild(self) -> discord.Guild | None:
@@ -127,6 +128,22 @@ class RankBot(commands.Bot):
     # ---- every night at the closing bell ---------------------------------------
     @tasks.loop(time=NIGHTLY)
     async def nightly(self) -> None:
+        await self.closing_routine()
+
+    def backup(self) -> None:
+        """Keeps a safe dated copy of the database beside it, for the last two weeks."""
+        folder = config.DB_PATH.parent / "backups"
+        folder.mkdir(exist_ok=True)
+        self.db.backup_to(folder / f"{config.DB_PATH.stem}-{datetime.now(ZONE):%Y-%m-%d}.db")
+        for old in sorted(folder.glob(f"{config.DB_PATH.stem}-*.db"))[:-14]:
+            old.unlink()
+
+    async def closing_routine(self) -> None:
+        self.db.set("last_bell", datetime.now(ZONE).date().isoformat())
+        try:
+            self.backup()
+        except Exception:
+            log.exception("Nightly backup failed")
         if self.db.get("paused") == "1":
             log.info("Nightly routine skipped: paused")
             return
@@ -142,6 +159,14 @@ class RankBot(commands.Bot):
     @nightly.before_loop
     async def _wait_until_ready(self) -> None:
         await self.wait_until_ready()
+        await self.get_cog("Posts").catch_up()
+        today = datetime.now(ZONE).date().isoformat()
+        last_bell = self.db.get("last_bell")
+        if last_bell is None:
+            self.db.set("last_bell", today)
+        elif last_bell < today:                                # the bot was off at midnight
+            log.info("Ringing the closing bell missed since %s", last_bell)
+            await self.closing_routine()
         due = self.game.due_round(datetime.now(ZONE).date())   # catch up if the bot was off when a round opened
         if due:
             await self.announce_round(self.game.open_round(due["key"]))
