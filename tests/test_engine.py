@@ -189,6 +189,30 @@ def test_university_pages_keep_every_diary(tmp_path):
     assert not any("RealName" in text for text in files.values())    # Discord names stay private
 
 
+def test_price_charts(tmp_path):
+    db, game = new_game(tmp_path, seed=4)
+    game.open_round("welcome")
+    tags = [name.replace(" ", "").replace("&", "") for name in NAMES[:8]]
+    for i, tag in enumerate(tags):
+        game.register_or_pitch(f"#{tag}\nA fine institution.", i, f"P{i}", 100 + i)
+    assert "<svg" not in site.build(db, game)["index.html"]             # no trading yet: no chart
+    game.commit(asyncio.run(game.close()))
+    first = site.build(db, game)["index.html"]
+    assert "Insufficient data" in first and "<svg" not in first         # one day can't make a line
+    for _ in range(3):
+        game.commit(asyncio.run(game.close()))
+    late = game.register_or_pitch("#ZzyzxCollege\nWe just got here.", 9, "Late", 900)
+    game.commit(asyncio.run(game.close()))
+    files = site.build(db, game)
+    front = files["index.html"]
+    assert "The Exchange: Top Five" in front and front.count("class='dot'") == 5
+    # Every university with two or more days gets a line, bright or faint; the newest has one point so far
+    assert front.count("class='series'") + front.count("class='pack'") == 8
+    assert "NaN" not in front and "<svg" in files[f"archive/day-{db.day}.html"]
+    assert "<svg" in files["university/grandprairiepolytechnic.html"]
+    assert "<svg" not in files[f"university/{late.school['tag_key']}.html"]   # one point so far
+
+
 def test_publish_is_one_commit(monkeypatch):
     calls = []
 

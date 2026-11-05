@@ -22,9 +22,26 @@ log = logging.getLogger(__name__)
 SITE_DIR = config.ROOT / "site"
 
 CSS = """
-:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf; }
-@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17; } }
+:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf;
+  --s0:#2a78d6; --s1:#eb6834; --s2:#1baf7a; --s3:#eda100; --s4:#e87ba4; --s5:#008300; --s6:#6250d6; --s7:#e34948; --pack:#d9d1c3; }
+@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17;
+  --s0:#3987e5; --s1:#d95926; --s2:#199e70; --s3:#c98500; --s4:#d55181; --s5:#008300; --s6:#9085e9; --s7:#e66767; --pack:#3a352c; } }
 * { box-sizing:border-box; }
+.chart { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.chart h3 { margin-bottom:4px; }
+.chart .note { margin:0 0 8px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.chart svg { display:block; width:100%; height:auto; }
+.chart text { font:14px system-ui, sans-serif; fill:var(--muted); }
+.chart text.end { fill:var(--ink); font-weight:700; }
+.chart .grid-line { stroke:var(--rule); stroke-width:1; }
+.chart .series { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.chart .pack { fill:none; stroke:var(--pack); stroke-width:1; stroke-linejoin:round; }
+.chart .hit { fill:transparent; }
+.chart .dot { stroke:var(--paper); stroke-width:2; }
+.legend { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:8px; font:13px/1.4 system-ui, sans-serif; }
+.legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+@media (max-width:560px) { .chart text { font-size:24px; } }
+.lead .chart { padding:14px 0 0; border-bottom:0; max-width:520px; }
 a { color:var(--accent); text-underline-offset:2px; }
 a:hover { text-decoration-thickness:2px; }
 td a, .who a { font-weight:700; }
@@ -104,6 +121,68 @@ Share prices are not financial advice. Nothing is.</footer>
 </div></body></html>"""
 
 
+def _nice_ticks(low: float, high: float) -> list[float]:
+    """Three to five round prices spanning the range."""
+    span = max(high - low, 1)
+    step = next((s for s in (1, 2, 5, 10, 20, 25, 50, 100, 200, 500) if span / s <= 4), 1000)
+    tick = (low // step) * step
+    ticks = []
+    while tick < high + step:
+        ticks.append(tick)
+        tick += step
+    return ticks
+
+
+def _price_chart(series: list[dict], pack: list[list[tuple[int, float]]], day: int, label: str) -> str:
+    """An inline line chart. series: {code, color, points}. pack: other schools, drawn faintly behind."""
+    width, height = 640, 240
+    left, right, top, bottom = 62, 112, 12, 34
+    plot_w, plot_h = width - left - right, height - top - bottom
+    prices = [p for s in series for _, p in s["points"]] + [p for points in pack for _, p in points]
+    ticks = _nice_ticks(min(prices), max(prices))
+    low, high = ticks[0], ticks[-1]
+
+    def x(d):
+        return left + plot_w * (d - 1) / max(day - 1, 1)
+
+    def y(price):
+        return top + plot_h * (high - price) / (high - low)
+
+    def line(points):
+        return " ".join(f"{x(d):.1f},{y(p):.1f}" for d, p in points)
+
+    parts = []
+    for tick in ticks:
+        parts.append(f"<line class='grid-line' x1='{left}' x2='{width - right}' y1='{y(tick):.1f}' y2='{y(tick):.1f}'/>"
+                     f"<text x='{left - 8}' y='{y(tick) + 5:.1f}' text-anchor='end'>${tick:.0f}</text>")
+    every = max(1, (day - 1 + 4) // 5)
+    days = [d for d in range(1, day + 1) if (d - 1) % every == 0]
+    for d in days:
+        parts.append(f"<text x='{x(d):.1f}' y='{height - 8}' text-anchor='middle'>{'Day ' if d == 1 else ''}{d}</text>")
+    parts += [f"<polyline class='pack' points='{line(points)}'/>" for points in pack if len(points) > 1]
+    for s in reversed(series):
+        if len(s["points"]) > 1:
+            parts.append(f"<polyline class='series' style='stroke:var(--s{s['color']})' points='{line(s['points'])}'/>")
+    # Direct labels at the line ends, nudged apart so tickers don't collide
+    ends = sorted(series, key=lambda s: y(s["points"][-1][1]))
+    label_y, previous = {}, top - 20
+    for s in ends:
+        previous = max(y(s["points"][-1][1]) + 5, previous + 24)
+        label_y[s["code"]] = previous
+    overflow = max(0, previous - (height - bottom + 5))
+    for s in series:
+        d, p = s["points"][-1]
+        text_y = label_y[s["code"]] - overflow
+        parts.append(f"<line style='stroke:var(--s{s['color']})' stroke-width='1.5' x1='{x(d) + 4:.1f}' y1='{y(p):.1f}' "
+                     f"x2='{x(d) + 24:.1f}' y2='{text_y - 5:.1f}'/>"
+                     f"<circle class='dot' style='fill:var(--s{s['color']})' cx='{x(d):.1f}' cy='{y(p):.1f}' r='5'/>"
+                     f"<text class='end' x='{x(d) + 28:.1f}' y='{text_y:.1f}'>{_e(s['code'])}</text>")
+        for d, p in s["points"]:
+            parts.append(f"<circle class='hit' cx='{x(d):.1f}' cy='{y(p):.1f}' r='9'>"
+                         f"<title>{_e(s['code'])}, Day {d}: ${p:.2f}</title></circle>")
+    return (f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='{_e(label)}'>{''.join(parts)}</svg>")
+
+
 def build(db, game) -> dict[str, str]:
     """Returns {path: content} for the site: index.html, rankings.json, a dated archive page and a page for
     each university."""
@@ -157,6 +236,24 @@ def build(db, game) -> dict[str, str]:
     recent = db.conn.execute("SELECT p.*, s.name AS school_name, s.code AS code FROM policies p "
                              "JOIN schools s ON s.id = p.school_id ORDER BY p.id DESC LIMIT 6").fetchall()
 
+    # The chart: the top five by today's rank, the rest as faint context. Colors follow the university.
+    history = db.price_history()
+    top_rows = [r for r in rows if r["school_id"] in history][:5]
+    used: set[int] = set()
+    series = []
+    for r in top_rows:
+        color = next(c % 8 for c in range(r["school_id"] - 1, r["school_id"] + 7) if c % 8 not in used)
+        used.add(color)
+        series.append({"school_id": r["school_id"], "code": r["code"], "name": r["name"], "color": color,
+                       "points": history[r["school_id"]]})
+    chart_svg = ""
+    if day > 1 and series:
+        top_ids = {r["school_id"] for r in top_rows}
+        pack = [points for sid, points in history.items() if sid not in top_ids]
+        leader = series[0]
+        chart_svg = _price_chart(series, pack, day, f"Share prices by trading day. {leader['name']} leads at "
+                                                    f"${leader['points'][-1][1]:.2f} on Day {day}.")
+
     def front(prefix: str, home: str) -> str:
         def link(sid: int, text: str) -> str:
             return f"<a href='{prefix}university/{quote(_slug(schools[sid]))}.html'>{_e(text)}</a>"
@@ -182,12 +279,25 @@ def build(db, game) -> dict[str, str]:
         back = f"<a href='{home}'>Latest edition</a>" if prefix else ""
         nav = f"<nav class='days'>{back}{'<span>Past editions:</span>' + days if days else ''}</nav>" \
             if back or days else ""
+        title = "The Exchange: Top Five" if len(rows) > 5 else "The Exchange"
+        if chart_svg:
+            note = "Share prices by trading day." + (" Gray lines: the rest of the Conference." if len(rows) > 5 else "")
+            legend = "".join(f"<span><i style='background:var(--s{s['color']})'></i>"
+                             f"{link(s['school_id'], s['name'])}</span>" for s in series) if len(series) > 1 else ""
+            chart = (f"<section class='chart'><h3>{title}</h3><p class='note'>{note}</p>{chart_svg}"
+                     f"{f'<div class=legend>{legend}</div>' if legend else ''}</section>")
+        elif rows:
+            chart = (f"<section class='chart'><h3>{title}</h3>"
+                     "<p class='note'>Insufficient data. Analysts remain confident.</p></section>")
+        else:
+            chart = ""
         return _shell("US Snooze & Whirled Retort",
                       "Rankings of the Big Digit Conference, as traded on the UnderAcademy Exchange.", home,
                       f"""{dateline}
 <div class="ticker">{ticker or "<span>Markets closed</span>"}</div>
 {nav}
 {school_menu(prefix)}
+{chart}
 <section class="lead">{lead_html}</section>
 <div class="grid">
 <section><h3>The Rankings</h3><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
@@ -215,6 +325,12 @@ def build(db, game) -> dict[str, str]:
                         f"${row['price']:.2f} <b class='{cls}'>{reports.arrow(pct)} {abs(pct):.1f}%</b></p>")
         else:
             standing = f"<p class='standing'><b>{_e(school['code'])}</b> · Not yet listed. Trading opens at the next closing bell.</p>"
+        own = history.get(sid, [])
+        price_line = ""
+        if day > 1 and len(own) > 1:
+            price_line = ("<div class='chart'>" + _price_chart(
+                [{"code": school["code"], "color": 0, "points": own}], [], day,
+                f"{school['name']} share price by trading day, now ${own[-1][1]:.2f}.") + "</div>")
         facts = "".join(f"<div><dt>{label}</dt><dd>{_e(school[key])}</dd></div>"
                         for label, key in (("Motto", "motto"), ("Mascot", "mascot"), ("Colors", "colors"),
                                            ("Location", "location"), ("Specialties", "specialties"),
@@ -241,7 +357,7 @@ def build(db, game) -> dict[str, str]:
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
 {school_menu("../")}
 <section class="lead"><h2>{_e(school['name'])}</h2>
-<p class="tag">#{_e(school['hashtag'])}</p>{standing}{f'<dl class="facts">{facts}</dl>' if facts else ''}</section>
+<p class="tag">#{_e(school['hashtag'])}</p>{standing}{price_line}{f'<dl class="facts">{facts}</dl>' if facts else ''}</section>
 <section class="section"><h3>College Fair Pitch</h3><div class="body">{_e(parsing.pitch_text(school['pitch'])) or 'No pitch on file.'}</div></section>
 <section class="section"><h3>College Characters</h3>{characters or '<p>No one has come forward.</p>'}</section>
 <div class="grid">

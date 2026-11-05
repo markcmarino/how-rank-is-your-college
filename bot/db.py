@@ -327,6 +327,13 @@ class Database:
             "VALUES(:day, :school_id, :score, :price, :rank, :stats_json)", [{**r, "day": day} for r in rows])
         self.conn.commit()
 
+    def price_history(self) -> dict[int, list[tuple[int, float]]]:
+        """Each university's (day, price) points, oldest first."""
+        history: dict[int, list[tuple[int, float]]] = {}
+        for r in self.conn.execute("SELECT school_id, day, price FROM snapshots ORDER BY day").fetchall():
+            history.setdefault(r["school_id"], []).append((r["day"], r["price"]))
+        return history
+
     def snapshot(self, day: int) -> dict[int, sqlite3.Row]:
         rows = self.conn.execute("SELECT * FROM snapshots WHERE day = ?", (day,)).fetchall()
         return {r["school_id"]: r for r in rows}
