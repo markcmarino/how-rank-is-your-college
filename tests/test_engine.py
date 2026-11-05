@@ -251,6 +251,34 @@ def test_register_shows_every_policy_filed_since_the_last_bell(tmp_path):
     assert "No new filings" in quiet and quiet.count("<blockquote>") == 6
 
 
+def test_closing_bell_always_links_the_retort(monkeypatch):
+    from bot.main import RankBot
+
+    posts, order = [], []
+
+    async def post(key, text):
+        posts.append((key, text))
+        order.append("post")
+
+    async def update_site():
+        order.append("site")
+
+    fake_bot = SimpleNamespace(post=post, update_site=update_site)
+    report = SimpleNamespace(day=1, commentary="Markets rose.", ticker="TTU 100", table="table", school_reports={})
+
+    monkeypatch.setattr(config, "SITE_REPO", "markcmarino/how-rank-is-your-college")
+    monkeypatch.setattr(config, "SITE_GITHUB_TOKEN", "")   # the link doesn't depend on this publish succeeding
+    asyncio.run(RankBot.publish(fake_bot, report))
+    assert posts[-1][0] == "exchange"
+    assert "https://markcmarino.github.io/how-rank-is-your-college/" in posts[-1][1]
+    assert order[-2:] == ["site", "post"]            # posted after the paper has been updated
+
+    posts.clear()
+    monkeypatch.setattr(config, "SITE_REPO", "")
+    asyncio.run(RankBot.publish(fake_bot, report))
+    assert len(posts) == 3 and not any("Retort" in text for _, text in posts)
+
+
 def test_publish_is_one_commit(monkeypatch):
     calls = []
 

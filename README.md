@@ -29,7 +29,7 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
 
 - **Rounds open themselves** at midnight Pacific on the dates in the Sheet's Rounds tab (Nov 9, 13, 17 and 20).
   `/admin round` opens one by hand.
-- **The closing bell** runs every night at midnight: commentary, ticker and table in #rankings-rank, each
+- **The closing bell** runs every night at midnight: commentary, ticker, table and a link to the Retort in #rankings-rank, each
   university's report in a thread under it, then the public page. `/admin convene` runs one early, and
   `preview:True` shows it to you first (post it with `/admin publish`).
 - **University Under Review:** each edition of the public page features at least two universities, longest-waiting

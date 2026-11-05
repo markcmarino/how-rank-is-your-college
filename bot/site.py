@@ -507,6 +507,14 @@ def _ensure_branch(branch: str) -> None:
         _api("POST", "/git/refs", {"ref": f"refs/heads/{branch}", "sha": sha})
 
 
+def public_url() -> str | None:
+    """The paper's permanent address, worked out from SITE_REPO. It's the same link every day."""
+    if "/" not in config.SITE_REPO:
+        return None
+    owner, repo = config.SITE_REPO.split("/", 1)
+    return f"https://{owner}.github.io/{repo}/"
+
+
 def publish(files: dict[str, str]) -> str | None:
     """Uploads the site to the gh-pages branch as one commit. Returns the public URL, or None if not configured."""
     if not (config.SITE_GITHUB_TOKEN and config.SITE_REPO):
@@ -519,5 +527,4 @@ def publish(files: dict[str, str]) -> str | None:
         {"path": path, "mode": "100644", "type": "blob", "content": content} for path, content in files.items()]})
     commit = _api("POST", "/git/commits", {"message": "Update the Retort", "tree": tree["sha"], "parents": [head]})
     _api("PATCH", f"/git/refs/heads/{branch}", {"sha": commit["sha"]})
-    owner, repo = config.SITE_REPO.split("/", 1)
-    return f"https://{owner}.github.io/{repo}/"
+    return public_url()

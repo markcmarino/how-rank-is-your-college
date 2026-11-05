@@ -105,6 +105,9 @@ class RankBot(commands.Bot):
             except discord.HTTPException:
                 log.exception("Couldn't post the daily reports thread")
         await self.update_site()
+        url = site.public_url()
+        if url:
+            await self.post("exchange", f"📰 **Read the full story in the US Snooze & Whirled Retort:**\n{url}")
 
     async def update_site(self) -> None:
         try:
