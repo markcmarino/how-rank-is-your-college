@@ -324,6 +324,7 @@ class Game:
         db.set(f"commentary_{day}", report.commentary)
         for table, ids in report.processed.items():
             db.mark_processed(table, ids)
+        db.set(f"policies_filed_{day}", json.dumps(report.processed.get("policies", [])))
         db.set("day", day)
         self.pending = None
 

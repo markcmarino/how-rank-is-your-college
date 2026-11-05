@@ -307,6 +307,12 @@ def build(db, game) -> dict[str, str]:
 
     reviewed = _under_review(db, day, [r["school_id"] for r in rows]) if rows else []
 
+    # The Register shows everything filed since the last bell, so every school that filed reaches the front page
+    filed_ids = set(json.loads(db.get(f"policies_filed_{day}") or "[]"))
+    filed = sorted((p for p in db.conn.execute("SELECT p.*, s.name AS school_name, s.code AS code FROM policies p "
+                                               "JOIN schools s ON s.id = p.school_id").fetchall() if p["id"] in filed_ids),
+                   key=lambda p: (rank_of.get(p["school_id"], 9999), p["id"]))
+
     def front(prefix: str, home: str) -> str:
         def link(sid: int, text: str) -> str:
             return f"<a href='{prefix}university/{quote_url(_slug(schools[sid]))}.html'>{_e(text)}</a>"
@@ -328,9 +334,11 @@ def build(db, game) -> dict[str, str]:
             for r in rows)
         stories = "".join(story(e) for e in (big + policy_stories)[:10]) or "<p>No news is good news. Or is it?</p>"
         diary_html = "".join(story(e) for e in leaks) or "<p>The diaries are quiet.</p>"
-        register = "".join(f"<blockquote>{_e(reports_excerpt(p['text']))}<cite>{_e(p['code'])}-{p['number']}, "
+        register = "".join(f"<blockquote>{_e(reports_excerpt(p['text'], 160))}<cite>{_e(p['code'])}-{p['number']}, "
                            f"{_e(p['kind'])}, {link(p['school_id'], p['school_name'])}</cite></blockquote>"
-                           for p in recent) or "<p>No policies yet.</p>"
+                           for p in (filed or recent)) or "<p>No policies yet.</p>"
+        if recent and not filed:
+            register = "<p class='tag'>No new filings since the last closing bell. From the archives:</p>" + register
         days = "".join(f"<a href='{prefix}archive/day-{n}.html'>Day {n}</a>" for n in range(day - 1, 0, -1))
         back = f"<a href='{home}'>Latest edition</a>" if prefix else ""
         nav = f"<nav class='days'>{back}{'<span>Past editions:</span>' + days if days else ''}</nav>" \

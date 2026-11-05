@@ -236,6 +236,21 @@ def test_every_university_gets_reviewed_before_any_repeats(tmp_path):
     assert late.school["id"] in json.loads(db.get(f"under_review_{db.day}"))   # a late joiner goes straight to the front
 
 
+def test_register_shows_every_policy_filed_since_the_last_bell(tmp_path):
+    db, game = new_game(tmp_path, seed=6)
+    game.open_round("welcome")
+    tags = [name.replace(" ", "").replace("&", "") for name in NAMES[:10]]
+    for i, tag in enumerate(tags):
+        game.register_or_pitch(f"#{tag}\nA fine institution.", i, f"P{i}", 100 + i)
+        assert game.file_policy(f"#{tag} Policy number {i} from this school.", i, f"P{i}", 200 + i).ok
+    game.commit(asyncio.run(game.close()))
+    register = site.build(db, game)["index.html"].split("From the Policy Register")[1].split("</section>")[0]
+    assert all(f"Policy number {i} from" in register for i in range(10))   # not just the newest six
+    game.commit(asyncio.run(game.close()))
+    quiet = site.build(db, game)["index.html"].split("From the Policy Register")[1].split("</section>")[0]
+    assert "No new filings" in quiet and quiet.count("<blockquote>") == 6
+
+
 def test_publish_is_one_commit(monkeypatch):
     calls = []
 
