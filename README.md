@@ -16,8 +16,9 @@ Players don't need any commands. They just post, starting with hashtags, and the
 | #policies-rank | `#TaukTechU` then the policy | Files it as the current round's kind (Policy, Amendment, Extreme Measure, Graduation Speech), guesses its domain from keywords, and prices it in at the next closing bell. 📜 |
 | #secret-diary-rank | `#Ellen #groundskeeper #TaukTechU` then the entry | Files it as evidence for the next closing bell. 📓 |
 
-- **In a class?** Add `#10am`, `#11am` or `#1pm` to the university's first pitch, or to a later pitch if you forgot.
-  Guests leave it off and aren't entered in the class winner draw. `/admin school` can correct a section.
+- **In a class?** Add `#10am`, `#11am` or `#1pm` to the university's pitch and to your character's introduction.
+  An introduction fills in a missing section, but only a pitch or `/admin school` can change one. Guests leave it off
+  and aren't entered in the class winner draw.
 - **Misspelled hashtag?** The bot replies "Did you mean #TaukTechU?" A genuinely new university that looks like
   an existing one can add `#new` to its first pitch.
 - **Catching up?** Add a round tag, such as `#round1`, `#welcomeweek`, `#midterms`, `#finals` or `#epilogue`, and

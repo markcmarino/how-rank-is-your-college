@@ -263,12 +263,33 @@ def test_class_section_hashtag_on_a_pitch(tmp_path):
     guest = game.register_or_pitch("#SaintAlgorithm\nHoly.", 3, "C", 3)
     assert guest.school["section"] is None and "#11am" in guest.message
     fixed = game.register_or_pitch("#SaintAlgorithm #11am\nStill holy.", 3, "C", 4)
-    assert fixed.school["section"] == "11am" and "11am" in fixed.message
+    assert fixed.school["section"] == "11am" and "11am" in fixed.message and fixed.notify
     # A plain later pitch leaves the section alone and stays quiet
     later = game.register_or_pitch("#SaintAlgorithm\nEven holier.", 3, "C", 5)
     assert later.school["section"] == "11am" and later.message == ""
     # A section tag alone isn't a university
     assert not game.register_or_pitch("#10am\nWhich school?", 4, "D", 6).ok
+
+
+def test_class_section_hashtag_on_a_character_intro(tmp_path):
+    db, game = new_game(tmp_path)
+    game.open_round("welcome")
+    game.register_or_pitch("#TaukTechU\nA fine place.", 1, "A", 1)
+    # Wherever the section tag sits, it isn't taken for the character's name or role, and fills in a blank section
+    filed = game.file_character("#10am #Ellen #groundskeeper #TaukTechU\nTends the quad.", 1, "A", 2)
+    assert filed.ok and filed.notify and "10am" in filed.message and db.find_school("TaukTechU")["section"] == "10am"
+    # Agreeing is quiet; disagreeing is flagged and doesn't move the university
+    assert game.file_character("#Sanya #10am #student #TaukTechU\nWorks.", 2, "B", 3).message == ""
+    clash = game.file_character("#Tanner #student #TaukTechU #1pm\nFoosball.", 3, "C", 4)
+    assert clash.ok and clash.notify and "10am" in clash.message and db.find_school("TaukTechU")["section"] == "10am"
+    people = {(c["name"], c["role"]) for c in db.conn.execute("SELECT name, role FROM characters")}
+    assert people == {("Ellen", "groundskeeper"), ("Sanya", "student"), ("Tanner", "student")}
+    # A habit of adding it to a diary or policy does no harm
+    assert game.file_diary("#10am #Ellen #groundskeeper #TaukTechU\nDear diary.", 1, "A", 5).ok
+    row = db.conn.execute("SELECT character, role FROM diaries").fetchone()
+    assert (row["character"], row["role"]) == ("Ellen", "groundskeeper")
+    policy = game.file_policy("#TaukTechU #10am Robots teach.", 1, "A", 6)
+    assert policy.ok and not policy.notify               # filed policies stay quiet in the channel
 
 
 def test_winner_draw_rewards_posts_within_each_section(tmp_path):

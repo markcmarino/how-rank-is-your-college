@@ -40,6 +40,7 @@ class Filed:
     message: str = ""          # reply to post in the channel, if any
     school: object = None
     new_school: bool = False
+    notify: bool = False       # a filed post whose message should still be sent as a reply
 
 
 def parse_date(text: str | None) -> date | None:
@@ -159,7 +160,8 @@ class Game:
                                f"looks wrong, post your hashtag again with a line like `Name: Tauk Tech University`. "
                                f"{note}", school, True)
         if moved:
-            return Filed(True, f"🏛️ **{school['name']}** is now in the **{section}** class section.", school)
+            return Filed(True, f"🏛️ **{school['name']}** is now in the **{section}** class section.", school,
+                         notify=True)
         return Filed(True, "", school)
 
     def _school_from_tags(self, tags: list[str]) -> tuple[object, list[str], str | None]:
@@ -180,7 +182,7 @@ class Game:
                     break
         if school is None:
             for tag in others:
-                if parsing.policy_kind([tag]) or parsing.round_tag([tag], self.rounds()):
+                if parsing.policy_kind([tag]) or parsing.round_tag([tag], self.rounds()) or parsing.split_section([tag])[0]:
                     continue
                 suggestion = suggestion or parsing.did_you_mean(tag, self.school_names())
         return school, others, suggestion
@@ -213,6 +215,7 @@ class Game:
     def file_character(self, content: str, user_id: int, user_name: str, message_id: int,
                        posted_at: datetime | None = None) -> Filed:
         tags, body = parsing.leading_tags(content)
+        section, tags = parsing.split_section(tags)
         school, others, suggestion = self._school_from_tags(tags)
         if school is None:
             return self._unknown(suggestion, "👋")
@@ -225,7 +228,19 @@ class Game:
         self.db.add_member(user_id, school["id"], user_name)
         self.db.add_post(user_id, user_name, school["id"], "character", rnd["key"] if rnd else None,
                          len(body.split()), message_id, _stamp(posted_at))
-        return Filed(True, "", school)
+        note = self._note_section(school, section)
+        return Filed(True, note, school, notify=bool(note))
+
+    def _note_section(self, school, section: str | None) -> str:
+        """A character intro can name the class section. It fills in a blank one, but only a pitch can change it,
+        so one mistaken intro can't move a whole university out of its section's draw."""
+        if not section or section == school["section"]:
+            return ""
+        if not school["section"]:
+            self.db.update_school(school["id"], section=section)
+            return f"🏛️ **{school['name']}** is now in the **{section}** class section."
+        return (f"👋 Your character is filed, but **{school['name']}** is listed in the **{school['section']}** "
+                f"section. If that's wrong, ask the showrunners to fix it.")
 
     def file_diary(self, content: str, user_id: int, user_name: str, message_id: int,
                    posted_at: datetime | None = None) -> Filed:
@@ -262,8 +277,9 @@ class Game:
         return next(r for r in self.rounds() if r["key"] == latest)
 
     def _strip_tags(self, tags: list[str]) -> list[str]:
-        """Drops round and kind tags, leaving #charactername #role."""
-        return [t for t in tags if not parsing.round_tag([t], self.rounds()) and not parsing.policy_kind([t])]
+        """Drops round, kind and class section tags, leaving #charactername #role."""
+        return [t for t in parsing.split_section(tags)[1]
+                if not parsing.round_tag([t], self.rounds()) and not parsing.policy_kind([t])]
 
     def _round_key(self, posted_at: datetime | None = None) -> str | None:
         rnd = self._round_at(posted_at)

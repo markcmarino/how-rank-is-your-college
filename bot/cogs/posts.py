@@ -93,8 +93,9 @@ class Posts(commands.Cog):
                 await message.add_reaction(REACTIONS[key])
             except discord.HTTPException:
                 pass
-            if filed.new_school:
+            if filed.new_school or filed.notify:
                 await message.reply(filed.message, mention_author=False)
+            if filed.new_school:
                 await self.bot.post("announcements", f"🔔 New listing on the UnderAcademy Exchange: "
                                                      f"**{filed.school['name']}** (#{filed.school['hashtag']}) "
                                                      f"trades as **{filed.school['code']}**.")
