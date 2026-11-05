@@ -1,11 +1,41 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>University of the Cloud · US Snooze &amp; Whirled Retort</title>
-<meta name="description" content="Trading as UC on the UnderAcademy Exchange.">
+<meta name="description" content="Please Hold">
 <style>
-:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf; }
-@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17; } }
+:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf;
+  --s0:#2a78d6; --s1:#eb6834; --s2:#1baf7a; --s3:#eda100; --s4:#e87ba4; --s5:#008300; --s6:#6250d6; --s7:#e34948; --pack:#d9d1c3; }
+@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17;
+  --s0:#3987e5; --s1:#d95926; --s2:#199e70; --s3:#c98500; --s4:#d55181; --s5:#008300; --s6:#9085e9; --s7:#e66767; --pack:#3a352c; } }
 * { box-sizing:border-box; }
+.chart { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.chart h3 { margin-bottom:4px; }
+.chart .note { margin:0 0 8px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.chart svg { display:block; width:100%; height:auto; }
+.chart text { font:14px system-ui, sans-serif; fill:var(--muted); }
+.chart text.end { fill:var(--ink); font-weight:700; }
+.chart .grid-line { stroke:var(--rule); stroke-width:1; }
+.chart .series { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.chart .pack { fill:none; stroke:var(--pack); stroke-width:1; stroke-linejoin:round; }
+.chart .hit { fill:transparent; }
+.chart .dot { stroke:var(--paper); stroke-width:2; }
+.trend { width:72px; padding-left:8px; padding-right:8px; }
+.trend svg { display:block; width:64px; height:20px; }
+.trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+.reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
+.review { min-width:0; overflow-wrap:anywhere; }
+.review h4 { margin:0; font-size:21px; line-height:1.2; }
+.review .standing { display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:6px 0 10px !important; font-size:14px; }
+.review .standing svg { width:80px; height:25px; flex:none; }
+.review blockquote { margin:0 0 8px; }
+.review .more { font:13px/1.4 system-ui, sans-serif; }
+.legend { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:8px; font:13px/1.4 system-ui, sans-serif; }
+.legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+@media (max-width:560px) { .chart text { font-size:24px; } }
+.lead .chart { padding:14px 0 0; border-bottom:0; max-width:520px; }
 a { color:var(--accent); text-underline-offset:2px; }
 a:hover { text-decoration-thickness:2px; }
 td a, .who a { font-weight:700; }
@@ -40,7 +70,7 @@ body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.55 Georg
 .lead h2 { font-size:clamp(24px, 4vw, 36px); line-height:1.15; margin:0 0 10px; }
 .lead p { margin:0; font-size:19px; }
 .grid { display:grid; grid-template-columns:1.4fr 1fr; gap:32px; padding-top:20px; }
-@media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+@media (max-width:860px) { .grid { grid-template-columns:1fr; } }
 h3 { font:700 13px/1.3 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
   border-top:2px solid var(--ink); padding-top:8px; margin:0 0 12px; }
 table { width:100%; border-collapse:collapse; font:15px/1.4 system-ui, sans-serif; }
@@ -62,18 +92,20 @@ footer { margin-top:40px; border-top:3px double var(--ink); padding-top:12px; fo
 <header class="masthead"><div class="over">The UnderAcademy Exchange presents</div>
 <h1><a href="../index.html">US Snooze &amp; Whirled Retort</a></h1>
 <div class="over">Big Digit Conference Rankings · How Rank is Your College?</div></header>
-<div class='dateline'><span>Tuesday, November 3, 2026</span><span>Trading Day 1</span><span>Round 2: Midterms</span></div>
+<div class='dateline'><span>Wednesday, November 4, 2026</span><span>Trading Day 3</span><span>Round 2: Midterms</span></div>
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
 <details class='schools'><summary>All universities (2)</summary><div><a href='../university/tauktechu.html'>Tauk Tech U</a><a href='../university/universityofthecloud.html'>University of the Cloud</a></div></details>
 <section class="lead"><h2>University of the Cloud</h2>
-<p class="tag">#UniversityoftheCloud</p><p class='standing'>Rank 2 of 2 · <b>UC</b> $126.65 <b class=''>■ 0.0%</b></p><dl class="facts"><div><dt>Mascot</dt><dd>The Latency</dd></div></dl></section>
-<section class="section"><h3>College Fair Pitch</h3><div class="body">No campus, no faculty, no refunds. Our quad is a server rack in Ohio.</div></section>
-<section class="section"><h3>College Characters</h3><p>No one has come forward.</p></section>
+<p class="tag">#UniversityoftheCloud</p><p class='standing'>Rank 2 of 2 · <b>UC</b> $125.12 <b class='up'>▲ 2.1%</b></p><div class='chart'><svg viewBox='0 0 640 240' role='img' aria-label='University of the Cloud share price by trading day, now $125.12.'><line class='grid-line' x1='62' x2='528' y1='206.0' y2='206.0'/><text x='54' y='211.0' text-anchor='end'>$122</text><line class='grid-line' x1='62' x2='528' y1='157.5' y2='157.5'/><text x='54' y='162.5' text-anchor='end'>$123</text><line class='grid-line' x1='62' x2='528' y1='109.0' y2='109.0'/><text x='54' y='114.0' text-anchor='end'>$124</text><line class='grid-line' x1='62' x2='528' y1='60.5' y2='60.5'/><text x='54' y='65.5' text-anchor='end'>$125</text><line class='grid-line' x1='62' x2='528' y1='12.0' y2='12.0'/><text x='54' y='17.0' text-anchor='end'>$126</text><text x='62.0' y='232' text-anchor='middle'>Day 1</text><text x='295.0' y='232' text-anchor='middle'>2</text><text x='528.0' y='232' text-anchor='middle'>3</text><polyline class='series' style='stroke:var(--s0)' points='62.0,202.6 295.0,180.8 528.0,54.7'/><line style='stroke:var(--s0)' stroke-width='1.5' x1='532.0' y1='54.7' x2='552.0' y2='54.7'/><circle class='dot' style='fill:var(--s0)' cx='528.0' cy='54.7' r='5'/><text class='end' x='556.0' y='59.7'>UC</text><circle class='hit' cx='62.0' cy='202.6' r='9'><title>UC, Day 1: $122.07</title></circle><circle class='hit' cx='295.0' cy='180.8' r='9'><title>UC, Day 2: $122.52</title></circle><circle class='hit' cx='528.0' cy='54.7' r='9'><title>UC, Day 3: $125.12</title></circle></svg></div><dl class="facts"><div><dt>Motto</dt><dd>Please Hold</dd></div><div><dt>Mascot</dt><dd>The Latency</dd></div><div><dt>Colors</dt><dd>Gray and Loading</dd></div><div><dt>Location</dt><dd>us-east-2</dd></div></dl></section>
+<section class="section"><h3>College Fair Pitch</h3><div class="body">No campus, no faculty, no refunds. Our quad is a server rack in Ohio, and our alumni are mostly a mailing list that cannot be unsubscribed from.</div></section>
+<section class="section"><h3>College Characters</h3><div class='story'><div class='who'>Priya, firstyear</div><div class='body'>Priya chose the University of the Cloud because the brochure said there were no prerequisites. There were no anything.</div></div><div class='story'><div class='who'>DeanBot, dean</div><div class='body'>Dean Bot was appointed after the previous dean could not be located in the org chart. It has an open door policy, but no door.</div></div></section>
 <div class="grid">
-<section><h3>Secret Diaries</h3><p>The diaries are quiet.</p></section>
-<section><h3>Policies</h3><blockquote class='body'>All tuition is now paid in training data. Boon: no student debt. Concession: the data includes your dreams.<cite>UC-1, Policy, Round 1: Welcome Week</cite></blockquote></section>
+<section><h3>Secret Diaries</h3><div class='story'><div class='who'>Priya, firstyear · Round 2: Midterms</div><div class='body'>I opted out of nightmares. Now I just dream about the invoice.</div></div><div class='story'><div class='who'>DeanBot, dean · Round 1: Welcome Week</div><div class='body'>Today I held a listening session. Attendance was 100 percent, because I was the only one in it. Morale is at an all time high.</div></div><div class='story'><div class='who'>Priya, firstyear · Round 1: Welcome Week</div><div class='body'>My roommate assignment came through. It is a Terms of Service update. We are getting along fine so far.
+
+I dreamed about the ocean last night and this morning my account was charged for a kayak.</div></div></section>
+<section><h3>Policies</h3><blockquote class='body'>Amendment to UC-1: dreams will now be anonymized before sale. Students may opt out of nightmares for a small fee.<cite>UC-2, Amendment, Round 2: Midterms</cite><ul><li>Day 3: Tauk Tech U has filed a formal amendment to University of the Cloud&#x27;s amendment, &quot;Amendment to UC-1: dreams will now be anonymized before sale&quot;. Nobody asked them.</li></ul></blockquote><blockquote class='body'>All tuition is now paid in training data. Boon: no student debt. Concession: the data includes your dreams.<cite>UC-1, Policy, Round 1: Welcome Week</cite><ul><li>Day 1: The library reports that &quot;All tuition is now paid in training data&quot; has filled the institutional repository with papers that cite each other in a perfect circle.</li></ul></blockquote></section>
 </div>
-<section class="section"><h3>In the News</h3><p>No news is good news. Or is it?</p></section>
+<section class="section"><h3>In the News</h3><div class='story'><div class='who'>Day 3</div>Leaked from University of the Cloud: Priya (firstyear) writes &quot;I opted out of nightmares. Now I just dream about the invoice.&quot; Lawyers have begun highlighting things.</div><div class='story'><div class='who'>Day 3</div>Tauk Tech U has filed a formal amendment to University of the Cloud&#x27;s amendment, &quot;Amendment to UC-1: dreams will now be anonymized before sale&quot;. Nobody asked them.</div><div class='story'><div class='who'>Day 2</div>The Exchange obtained a diary entry from DeanBot (dean): &quot;Today I held a listening session. Attendance was 100 percent, because I was the only one in it. Morale is at an all time high.&quot; Shares moved in sympathy.</div><div class='story'><div class='who'>Day 1</div>A leaked diary entry from Priya, firstyear at University of the Cloud, reads: &quot;My roommate assignment came through. It is a Terms of Service update. We are getting along fine so far. I dreamed about the ocean last...&quot; Analysts called it &quot;concerning, but bullish.&quot;</div><div class='story'><div class='who'>Day 1</div>The library reports that &quot;All tuition is now paid in training data&quot; has filled the institutional repository with papers that cite each other in a perfect circle.</div></section>
 <footer>A netprov. Any resemblance to real universities, living or dead, is purely coincidental.<br>
 Share prices are not financial advice. Nothing is.</footer>
 </div></body></html>

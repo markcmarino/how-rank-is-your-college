@@ -3,9 +3,39 @@
 <title>Tauk Tech U · US Snooze &amp; Whirled Retort</title>
 <meta name="description" content="Per Prompt Ad Astra">
 <style>
-:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf; }
-@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17; } }
+:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf;
+  --s0:#2a78d6; --s1:#eb6834; --s2:#1baf7a; --s3:#eda100; --s4:#e87ba4; --s5:#008300; --s6:#6250d6; --s7:#e34948; --pack:#d9d1c3; }
+@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17;
+  --s0:#3987e5; --s1:#d95926; --s2:#199e70; --s3:#c98500; --s4:#d55181; --s5:#008300; --s6:#9085e9; --s7:#e66767; --pack:#3a352c; } }
 * { box-sizing:border-box; }
+.chart { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.chart h3 { margin-bottom:4px; }
+.chart .note { margin:0 0 8px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.chart svg { display:block; width:100%; height:auto; }
+.chart text { font:14px system-ui, sans-serif; fill:var(--muted); }
+.chart text.end { fill:var(--ink); font-weight:700; }
+.chart .grid-line { stroke:var(--rule); stroke-width:1; }
+.chart .series { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.chart .pack { fill:none; stroke:var(--pack); stroke-width:1; stroke-linejoin:round; }
+.chart .hit { fill:transparent; }
+.chart .dot { stroke:var(--paper); stroke-width:2; }
+.trend { width:72px; padding-left:8px; padding-right:8px; }
+.trend svg { display:block; width:64px; height:20px; }
+.trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+.reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
+.review { min-width:0; overflow-wrap:anywhere; }
+.review h4 { margin:0; font-size:21px; line-height:1.2; }
+.review .standing { display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:6px 0 10px !important; font-size:14px; }
+.review .standing svg { width:80px; height:25px; flex:none; }
+.review blockquote { margin:0 0 8px; }
+.review .more { font:13px/1.4 system-ui, sans-serif; }
+.legend { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:8px; font:13px/1.4 system-ui, sans-serif; }
+.legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+@media (max-width:560px) { .chart text { font-size:24px; } }
+.lead .chart { padding:14px 0 0; border-bottom:0; max-width:520px; }
 a { color:var(--accent); text-underline-offset:2px; }
 a:hover { text-decoration-thickness:2px; }
 td a, .who a { font-weight:700; }
@@ -40,7 +70,7 @@ body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.55 Georg
 .lead h2 { font-size:clamp(24px, 4vw, 36px); line-height:1.15; margin:0 0 10px; }
 .lead p { margin:0; font-size:19px; }
 .grid { display:grid; grid-template-columns:1.4fr 1fr; gap:32px; padding-top:20px; }
-@media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+@media (max-width:860px) { .grid { grid-template-columns:1fr; } }
 h3 { font:700 13px/1.3 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
   border-top:2px solid var(--ink); padding-top:8px; margin:0 0 12px; }
 table { width:100%; border-collapse:collapse; font:15px/1.4 system-ui, sans-serif; }
@@ -62,18 +92,18 @@ footer { margin-top:40px; border-top:3px double var(--ink); padding-top:12px; fo
 <header class="masthead"><div class="over">The UnderAcademy Exchange presents</div>
 <h1><a href="../index.html">US Snooze &amp; Whirled Retort</a></h1>
 <div class="over">Big Digit Conference Rankings · How Rank is Your College?</div></header>
-<div class='dateline'><span>Tuesday, November 3, 2026</span><span>Trading Day 1</span><span>Round 2: Midterms</span></div>
+<div class='dateline'><span>Wednesday, November 4, 2026</span><span>Trading Day 3</span><span>Round 2: Midterms</span></div>
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
 <details class='schools'><summary>All universities (2)</summary><div><a href='../university/tauktechu.html'>Tauk Tech U</a><a href='../university/universityofthecloud.html'>University of the Cloud</a></div></details>
 <section class="lead"><h2>Tauk Tech U</h2>
-<p class="tag">#TaukTechU</p><p class='standing'>Rank 1 of 2 · <b>TTU</b> $127.05 <b class=''>■ 0.0%</b></p><dl class="facts"><div><dt>Motto</dt><dd>Per Prompt Ad Astra</dd></div><div><dt>Mascot</dt><dd>The Fighting Summaries</dd></div></dl></section>
-<section class="section"><h3>College Fair Pitch</h3><div class="body">A proud institution where every lecture has been replaced by a slightly longer lecture, summarized.</div></section>
-<section class="section"><h3>College Characters</h3><div class='story'><div class='who'>Ellen, groundskeeper</div><div class='body'>Ellen has tended the quad for 31 years and has recently been asked to train her replacement, a lawnmower with opinions.</div></div></section>
+<p class="tag">#TaukTechU</p><p class='standing'>Rank 1 of 2 · <b>TTU</b> $134.53 <b class='up'>▲ 0.4%</b></p><div class='chart'><svg viewBox='0 0 640 240' role='img' aria-label='Tauk Tech U share price by trading day, now $134.53.'><line class='grid-line' x1='62' x2='528' y1='206.0' y2='206.0'/><text x='54' y='211.0' text-anchor='end'>$130</text><line class='grid-line' x1='62' x2='528' y1='167.2' y2='167.2'/><text x='54' y='172.2' text-anchor='end'>$131</text><line class='grid-line' x1='62' x2='528' y1='128.4' y2='128.4'/><text x='54' y='133.4' text-anchor='end'>$132</text><line class='grid-line' x1='62' x2='528' y1='89.6' y2='89.6'/><text x='54' y='94.6' text-anchor='end'>$133</text><line class='grid-line' x1='62' x2='528' y1='50.8' y2='50.8'/><text x='54' y='55.8' text-anchor='end'>$134</text><line class='grid-line' x1='62' x2='528' y1='12.0' y2='12.0'/><text x='54' y='17.0' text-anchor='end'>$135</text><text x='62.0' y='232' text-anchor='middle'>Day 1</text><text x='295.0' y='232' text-anchor='middle'>2</text><text x='528.0' y='232' text-anchor='middle'>3</text><polyline class='series' style='stroke:var(--s0)' points='62.0,175.7 295.0,53.5 528.0,30.2'/><line style='stroke:var(--s0)' stroke-width='1.5' x1='532.0' y1='30.2' x2='552.0' y2='30.2'/><circle class='dot' style='fill:var(--s0)' cx='528.0' cy='30.2' r='5'/><text class='end' x='556.0' y='35.2'>TTU</text><circle class='hit' cx='62.0' cy='175.7' r='9'><title>TTU, Day 1: $130.78</title></circle><circle class='hit' cx='295.0' cy='53.5' r='9'><title>TTU, Day 2: $133.93</title></circle><circle class='hit' cx='528.0' cy='30.2' r='9'><title>TTU, Day 3: $134.53</title></circle></svg></div><dl class="facts"><div><dt>Motto</dt><dd>Per Prompt Ad Astra</dd></div><div><dt>Mascot</dt><dd>The Fighting Summaries</dd></div><div><dt>Colors</dt><dd>Beige and Pending</dd></div><div><dt>Location</dt><dd>Tauk, Ohio</dd></div></dl></section>
+<section class="section"><h3>College Fair Pitch</h3><div class="body">A proud institution where every lecture has been replaced by a slightly longer lecture, summarized. Founded by a railroad, sold to a mattress company, and now in a strategic partnership with AI Corpone.</div></section>
+<section class="section"><h3>College Characters</h3><div class='story'><div class='who'>Ellen, groundskeeper</div><div class='body'>Ellen has tended the quad for 31 years and has recently been asked to train her replacement, a lawnmower with opinions.</div></div><div class='story'><div class='who'>Marcus, sophomore</div><div class='body'>Marcus came to Tauk Tech for the marching band, which has since been optimized into a single trombone.</div></div><div class='story'><div class='who'>DrOyelaran, professor</div><div class='body'>Dr. Oyelaran teaches Medieval History and has been told her course is now a feature.</div></div></section>
 <div class="grid">
-<section><h3>Secret Diaries</h3><div class='story'><div class='who'>Ellen, groundskeeper · Round 1: Welcome Week</div><div class='body'>Dear diary, a tutor asked me to summarize the lawn. I said it was grass. It gave me a B minus and suggested more sources.</div></div></section>
-<section><h3>Policies</h3><blockquote class='body'>Amendment to TTU-1: tutors may no longer retain ownership of office hours, but they may license them back to the student at a reasonable monthly rate.<cite>TTU-2, Amendment, Round 2: Midterms</cite></blockquote><blockquote class='body'>All lectures will now be delivered by AI Corpone tutors. Boon: every course is available at 3 a.m. Concession: the tutors retain ownership of anything said in office hours.<cite>TTU-1, Policy, Round 1: Welcome Week</cite><ul><li>Day 1: Under &quot;All lectures will now be delivered by AI Corpone tutors&quot;, office hours are now held by a chatbot that only says &quot;Great question!&quot;</li></ul></blockquote></section>
+<section><h3>Secret Diaries</h3><div class='story'><div class='who'>Marcus, sophomore · Round 2: Midterms</div><div class='body'>The trombone was let go. I asked who would play at the game. They showed me a very good summary of a game.</div></div><div class='story'><div class='who'>Ellen, groundskeeper · Round 2: Midterms</div><div class='body'>The lawnmower has unionized. I am told this is a good sign for the sector. It has asked me to stop calling it the lawnmower.</div></div><div class='story'><div class='who'>DrOyelaran, professor · Round 1: Welcome Week</div><div class='body'>I was asked to contribute my lecture notes to the Knowledge Lake. I asked where the lake was. A man from Facilities pointed at the old library and then looked away.</div></div><div class='story'><div class='who'>Marcus, sophomore · Round 1: Welcome Week</div><div class='body'>I went to office hours at 3 a.m. because that is when they are. The tutor said my question was great. It said this before I asked it.</div></div><div class='story'><div class='who'>Ellen, groundskeeper · Round 1: Welcome Week</div><div class='body'>Dear diary, a tutor asked me to summarize the lawn. I said it was grass. It gave me a B minus and suggested more sources.</div></div></section>
+<section><h3>Policies</h3><blockquote class='body'>Amendment to TTU-1: tutors may no longer retain ownership of office hours, but they may license them back to the student at a reasonable monthly rate.<cite>TTU-2, Amendment, Round 2: Midterms</cite><ul><li>Day 3: The Library has adopted &quot;Amendment to TTU-1: tutors may no longer retain ownership of office...&quot; with enthusiasm, mostly by misunderstanding it.</li></ul></blockquote><blockquote class='body'>All lectures will now be delivered by AI Corpone tutors. Boon: every course is available at 3 a.m. Concession: the tutors retain ownership of anything said in office hours.<cite>TTU-1, Policy, Round 1: Welcome Week</cite><ul><li>Day 1: Faculty responded to &quot;All lectures will now be delivered by AI Corpone tutors&quot; by forming a committee to study forming a committee.</li></ul></blockquote></section>
 </div>
-<section class="section"><h3>In the News</h3><div class='story'><div class='who'>Day 1</div>Ellen, groundskeeper, wrote in a Secret Diary: &quot;Dear diary, a tutor asked me to summarize the lawn. I said it was grass. It gave me a B minus and suggested more sources.&quot; The entry has been shared 14,000 times, mostly by University of the Cloud.</div><div class='story'><div class='who'>Day 1</div>Under &quot;All lectures will now be delivered by AI Corpone tutors&quot;, office hours are now held by a chatbot that only says &quot;Great question!&quot;</div></section>
+<section class="section"><h3>In the News</h3><div class='story'><div class='who'>Day 3</div>A leaked diary entry from Ellen, groundskeeper at Tauk Tech U, reads: &quot;The lawnmower has unionized. I am told this is a good sign for the sector. It has asked me to stop calling it the lawnmower.&quot; Analysts called it &quot;concerning, but bullish.&quot;</div><div class='story'><div class='who'>Day 3</div>The Library has adopted &quot;Amendment to TTU-1: tutors may no longer retain ownership of office...&quot; with enthusiasm, mostly by misunderstanding it.</div><div class='story'><div class='who'>Day 2</div>The Exchange obtained a diary entry from DrOyelaran (professor): &quot;I was asked to contribute my lecture notes to the Knowledge Lake. I asked where the lake was. A man from Facilities pointed at the old...&quot; Shares moved in sympathy.</div><div class='story'><div class='who'>Day 1</div>Leaked from Tauk Tech U: Marcus (sophomore) writes &quot;I went to office hours at 3 a.m. because that is when they are. The tutor said my question was great. It said this before I asked it.&quot; Lawyers have begun highlighting things.</div><div class='story'><div class='who'>Day 1</div>Faculty responded to &quot;All lectures will now be delivered by AI Corpone tutors&quot; by forming a committee to study forming a committee.</div></section>
 <footer>A netprov. Any resemblance to real universities, living or dead, is purely coincidental.<br>
 Share prices are not financial advice. Nothing is.</footer>
 </div></body></html>
