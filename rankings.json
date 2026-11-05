@@ -1,23 +1,6 @@
 {
- "day": 3,
- "round": "Round 2: Midterms",
- "commentary": "University of the Cloud (UC) rallied 2.1% amid fresh questions about \"Amendment to UC-1: dreams will now be anonymized before sale\". Tauk Tech U (TTU) climbed 0.4% as rumors about \"Amendment to TTU-1: tutors may no longer retain ownership of office...\" spread through the dining hall.",
- "rankings": [
-  {
-   "rank": 1,
-   "name": "Tauk Tech U",
-   "hashtag": "TaukTechU",
-   "code": "TTU",
-   "price": 134.53,
-   "score": 53.81
-  },
-  {
-   "rank": 2,
-   "name": "University of the Cloud",
-   "hashtag": "UniversityoftheCloud",
-   "code": "UC",
-   "price": 125.12,
-   "score": 50.05
-  }
- ]
+ "day": 0,
+ "round": null,
+ "commentary": "",
+ "rankings": []
 }
