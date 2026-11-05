@@ -9,16 +9,18 @@ from __future__ import annotations
 import html
 import json
 import logging
+import math
 import random
 import urllib.error
 import urllib.request
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote as quote_url
 
 from . import config, parsing, reports
 
 log = logging.getLogger(__name__)
+REVIEW_EDITIONS = 13   # nights in the game, so every university is reviewed at least once
 SITE_DIR = config.ROOT / "site"
 
 CSS = """
@@ -38,6 +40,19 @@ CSS = """
 .chart .pack { fill:none; stroke:var(--pack); stroke-width:1; stroke-linejoin:round; }
 .chart .hit { fill:transparent; }
 .chart .dot { stroke:var(--paper); stroke-width:2; }
+.trend { width:72px; padding-left:8px; padding-right:8px; }
+.trend svg { display:block; width:64px; height:20px; }
+.trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+.reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
+.review { min-width:0; overflow-wrap:anywhere; }
+.review h4 { margin:0; font-size:21px; line-height:1.2; }
+.review .standing { display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:6px 0 10px !important; font-size:14px; }
+.review .standing svg { width:80px; height:25px; flex:none; }
+.review blockquote { margin:0 0 8px; }
+.review .more { font:13px/1.4 system-ui, sans-serif; }
 .legend { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:8px; font:13px/1.4 system-ui, sans-serif; }
 .legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle; }
 @media (max-width:560px) { .chart text { font-size:24px; } }
@@ -76,7 +91,7 @@ body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.55 Georg
 .lead h2 { font-size:clamp(24px, 4vw, 36px); line-height:1.15; margin:0 0 10px; }
 .lead p { margin:0; font-size:19px; }
 .grid { display:grid; grid-template-columns:1.4fr 1fr; gap:32px; padding-top:20px; }
-@media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+@media (max-width:860px) { .grid { grid-template-columns:1fr; } }
 h3 { font:700 13px/1.3 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
   border-top:2px solid var(--ink); padding-top:8px; margin:0 0 12px; }
 table { width:100%; border-collapse:collapse; font:15px/1.4 system-ui, sans-serif; }
@@ -183,6 +198,42 @@ def _price_chart(series: list[dict], pack: list[list[tuple[int, float]]], day: i
     return (f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='{_e(label)}'>{''.join(parts)}</svg>")
 
 
+def _trend(points: list[tuple[int, float]], cls: str, code: str) -> str:
+    """A tiny price line for the rankings table, scaled to that school's own range."""
+    if len(points) < 2:
+        return ""
+    prices = [p for _, p in points]
+    low, span = min(prices), (max(prices) - min(prices)) or 1
+    first, last = points[0][0], points[-1][0]
+
+    def x(d):
+        return 2 + 58 * (d - first) / max(last - first, 1)
+
+    def y(price):
+        return 17 - 14 * (price - low) / span
+
+    line = " ".join(f"{x(d):.1f},{y(p):.1f}" for d, p in points)
+    color = {"up": "var(--up)", "down": "var(--down)"}.get(cls, "var(--muted)")
+    return (f"<svg viewBox='0 0 64 20' role='img' aria-label='{_e(code)} price trend'><polyline points='{line}'/>"
+            f"<circle cx='{x(last):.1f}' cy='{y(prices[-1]):.1f}' r='2.5' style='fill:{color}'/></svg>")
+
+
+def _under_review(db, day: int, school_ids: list[int]) -> list[int]:
+    """The universities reviewed in this edition: whoever has waited longest, so everyone gets a turn before
+    anyone gets a second. The choice is saved, so rebuilding an edition doesn't change it."""
+    saved = db.get(f"under_review_{day}")
+    if saved is not None:
+        return [sid for sid in json.loads(saved) if sid in school_ids]
+    last_seen: dict[int, int] = {}
+    for earlier in range(1, day):
+        for sid in json.loads(db.get(f"under_review_{earlier}") or "[]"):
+            last_seen[sid] = earlier
+    per_edition = max(2, math.ceil(len(school_ids) / REVIEW_EDITIONS))
+    picks = sorted(school_ids, key=lambda sid: (last_seen.get(sid, 0), sid))[:per_edition]
+    db.set(f"under_review_{day}", json.dumps(picks))
+    return picks
+
+
 def build(db, game) -> dict[str, str]:
     """Returns {path: content} for the site: index.html, rankings.json, a dated archive page and a page for
     each university."""
@@ -254,20 +305,25 @@ def build(db, game) -> dict[str, str]:
         chart_svg = _price_chart(series, pack, day, f"Share prices by trading day. {leader['name']} leads at "
                                                     f"${leader['points'][-1][1]:.2f} on Day {day}.")
 
+    reviewed = _under_review(db, day, [r["school_id"] for r in rows]) if rows else []
+
     def front(prefix: str, home: str) -> str:
         def link(sid: int, text: str) -> str:
-            return f"<a href='{prefix}university/{quote(_slug(schools[sid]))}.html'>{_e(text)}</a>"
+            return f"<a href='{prefix}university/{quote_url(_slug(schools[sid]))}.html'>{_e(text)}</a>"
 
         def story(e):
             who = link(e["school_id"], schools[e["school_id"]]["name"]) if e["school_id"] in schools \
                 else "The Conference"
             return f"<div class='story'><div class='who'>{who}</div>{_e(e['text'])}</div>"
 
+        def trend_cell(r):
+            return f"<td class='trend'>{_trend(history.get(r['school_id'], []), change(r)[1], r['code'])}</td>" if day > 1 else ""
+
         table = "".join(
             f"<tr><td class='num'>{r['rank']}</td><td>{link(r['school_id'], r['name'])} "
             f"<span class='tag'>#{_e(r['hashtag'])}</span>"
             f"<span class='move {move_class(r)}'>{_e(reports.rank_move(r))}</span></td><td>{_e(r['code'])}</td>"
-            f"<td class='num'>${r['price']:.2f}</td>"
+            f"{trend_cell(r)}<td class='num'>${r['price']:.2f}</td>"
             f"<td class='num {change(r)[1]}'>{reports.arrow(change(r)[0])} {abs(change(r)[0]):.1f}%</td></tr>"
             for r in rows)
         stories = "".join(story(e) for e in (big + policy_stories)[:10]) or "<p>No news is good news. Or is it?</p>"
@@ -279,6 +335,30 @@ def build(db, game) -> dict[str, str]:
         back = f"<a href='{home}'>Latest edition</a>" if prefix else ""
         nav = f"<nav class='days'>{back}{'<span>Past editions:</span>' + days if days else ''}</nav>" \
             if back or days else ""
+        def review(sid: int) -> str:
+            school, row = schools[sid], next(r for r in rows if r["school_id"] == sid)
+            pct, cls = change(row)
+            diary = (db.diaries(sid) or [None])[-1]
+            if diary:
+                who = f"{diary['character']}, {diary['role']}" if diary["role"] else diary["character"]
+                quote = f"<blockquote>{_e(reports_excerpt(diary['text']))}<cite>{_e(who)}, in a Secret Diary</cite></blockquote>"
+            elif db.policies(sid):
+                policy = db.policies(sid)[-1]
+                quote = (f"<blockquote>{_e(reports_excerpt(policy['text']))}<cite>{_e(school['code'])}-{policy['number']}, "
+                         f"{_e(policy['kind'])}</cite></blockquote>")
+            else:
+                quote = f"<blockquote>{_e(reports_excerpt(parsing.pitch_text(school['pitch'])))}<cite>College Fair Pitch</cite></blockquote>"
+            motto = f"<p class='tag'>{_e(school['motto'])}</p>" if school["motto"] else ""
+            return (f"<article class='review'><h4>{link(sid, school['name'])}</h4>{motto}<p class='standing'>"
+                    f"<span>Rank {row['rank']} of {len(rows)} · ${row['price']:.2f} <b class='{cls}'>{reports.arrow(pct)} "
+                    f"{abs(pct):.1f}%</b></span>{_trend(history.get(sid, []), cls, school['code'])}</p>{quote}"
+                    f"<a class='more' href='{prefix}university/{quote_url(_slug(school))}.html'>Read the full file</a></article>")
+
+        reviews = ""
+        if reviewed:
+            reviews = ("<section class='reviews'><h3>University Under Review</h3><p class='note'>Each edition, the Retort's "
+                       "auditors visit another corner of the Conference. Every university's turn will come.</p>"
+                       f"<div class='review-grid'>{''.join(review(sid) for sid in reviewed)}</div></section>")
         title = "The Exchange: Top Five" if len(rows) > 5 else "The Exchange"
         if chart_svg:
             note = "Share prices by trading day." + (" Gray lines: the rest of the Conference." if len(rows) > 5 else "")
@@ -299,9 +379,10 @@ def build(db, game) -> dict[str, str]:
 {school_menu(prefix)}
 {chart}
 <section class="lead">{lead_html}</section>
+{reviews}
 <div class="grid">
 <section><h3>The Rankings</h3><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
-<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></section>
+{'<th class="trend">Trend</th>' if day > 1 else ''}<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></section>
 <section><h3>Top Stories</h3>{stories}</section>
 </div>
 <div class="grid">
@@ -310,7 +391,7 @@ def build(db, game) -> dict[str, str]:
 </div>""")
 
     def school_menu(prefix: str) -> str:
-        links = "".join(f"<a href='{prefix}university/{quote(_slug(s))}.html'>{_e(s['name'])}</a>"
+        links = "".join(f"<a href='{prefix}university/{quote_url(_slug(s))}.html'>{_e(s['name'])}</a>"
                         for s in sorted(schools.values(), key=lambda s: s["name"].lower()))
         return f"<details class='schools'><summary>All universities ({len(schools)})</summary><div>{links}</div></details>"
 

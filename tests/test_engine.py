@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import io
+import json
 import random
 from datetime import datetime, timezone
 from types import SimpleNamespace
@@ -211,6 +212,28 @@ def test_price_charts(tmp_path):
     assert "NaN" not in front and "<svg" in files[f"archive/day-{db.day}.html"]
     assert "<svg" in files["university/grandprairiepolytechnic.html"]
     assert "<svg" not in files[f"university/{late.school['tag_key']}.html"]   # one point so far
+
+
+def test_every_university_gets_reviewed_before_any_repeats(tmp_path):
+    db, game = new_game(tmp_path, seed=8)
+    game.open_round("welcome")
+    tags = [name.replace(" ", "").replace("&", "") for name in NAMES]
+    for i, tag in enumerate(tags):
+        game.register_or_pitch(f"#{tag}\nA fine institution.", i, f"RealName{i}", 100 + i)
+    seen = []
+    for _ in range(13):
+        game.commit(asyncio.run(game.close()))
+        first = site.build(db, game)
+        again = site.build(db, game)
+        assert first["index.html"] == again["index.html"]      # rebuilding an edition keeps its choice
+        section = first["index.html"].split("University Under Review")[1].split("</section>")[0]
+        seen += json.loads(db.get(f"under_review_{db.day}"))
+        assert "Read the full file" in section and "RealName" not in section
+    assert len(seen) == 26 and len(set(seen)) == 25            # everyone once, then the second time around begins
+    late = game.register_or_pitch("#ZzyzxCollege\nWe just got here.", 99, "Late", 900)
+    game.commit(asyncio.run(game.close()))
+    site.build(db, game)
+    assert late.school["id"] in json.loads(db.get(f"under_review_{db.day}"))   # a late joiner goes straight to the front
 
 
 def test_publish_is_one_commit(monkeypatch):

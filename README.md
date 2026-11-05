@@ -32,6 +32,8 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
 - **The closing bell** runs every night at midnight: commentary, ticker and table in #rankings-rank, each
   university's report in a thread under it, then the public page. `/admin convene` runs one early, and
   `preview:True` shows it to you first (post it with `/admin publish`).
+- **University Under Review:** each edition of the public page features at least two universities, longest-waiting
+  first, so everyone gets a turn before anyone gets a second.
 - **The finale**, whenever you like (including for groups playing out of season): `/admin vote open`, then
   `/admin vote close` to announce the people's champion (players can't vote for a university they posted for),
   or `/admin verdict` to crown a winner from the rankings after a randomized Final Audit.
