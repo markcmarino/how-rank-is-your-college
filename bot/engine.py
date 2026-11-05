@@ -133,7 +133,7 @@ class _SafeDict(dict):
 
 def fill(template: str, data: dict, rng: random.Random, **values) -> str:
     values.setdefault("department", rng.choice(data["departments"]) if data["departments"] else "the administration")
-    values.setdefault("rival", "a rival university")
+    values["rival"] = values.get("rival") or "a rival university"   # None when a university is alone in the game
     values["mascot"] = values.get("mascot") or "mascot"
     text = template.format_map(_SafeDict(values))
     return text[:1].upper() + text[1:]

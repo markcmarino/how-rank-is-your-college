@@ -251,6 +251,24 @@ def test_register_shows_every_policy_filed_since_the_last_bell(tmp_path):
     assert "No new filings" in quiet and quiet.count("<blockquote>") == 6
 
 
+def test_lone_university_gets_a_generic_rival(tmp_path):
+    from bot import engine
+
+    rng = random.Random(1)
+    data = {"departments": []}
+    assert engine.fill("{rival} copied it.", data, rng, rival=None) == "A rival university copied it."
+    assert engine.fill("{rival} copied it.", data, rng, rival="Lake Hubris") == "Lake Hubris copied it."
+    assert engine.fill("{rival} copied it.", data, rng) == "A rival university copied it."
+
+    db, game = new_game(tmp_path, seed=5)
+    game.open_round("welcome")
+    game.register_or_pitch("#TaukTechU\nAlone at last.", 1, "P1", 200)
+    for i in range(30):
+        game.file_policy(f"#TaukTechU Lectures are now given by robots, phase {i}.", 1, "P1", 300 + i)
+    report = asyncio.run(game.close())
+    assert "None" not in report.commentary + "".join(report.school_reports.values())
+
+
 def test_closing_bell_always_links_the_retort(monkeypatch):
     from bot.main import RankBot
 
