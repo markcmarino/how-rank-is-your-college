@@ -251,6 +251,66 @@ def test_register_shows_every_policy_filed_since_the_last_bell(tmp_path):
     assert "No new filings" in quiet and quiet.count("<blockquote>") == 6
 
 
+def test_class_section_hashtag_on_a_pitch(tmp_path):
+    db, game = new_game(tmp_path)
+    filed = game.register_or_pitch("#TaukTechU #10am\nA fine place.", 1, "A", 1)
+    assert filed.school["hashtag"] == "TaukTechU" and filed.school["section"] == "10am"
+    assert "10am" in filed.message and "#10am" not in filed.school["pitch"]
+    # The section tag can come first and in any capitals, and is never mistaken for the university
+    assert game.register_or_pitch("#1PM #LakeHubris\nDamp.", 2, "B", 2).school["section"] == "1pm"
+    assert db.find_school("10am") is None and db.find_school("1pm") is None
+    # A guest skips it and gets told how to add it; a later pitch fixes it
+    guest = game.register_or_pitch("#SaintAlgorithm\nHoly.", 3, "C", 3)
+    assert guest.school["section"] is None and "#11am" in guest.message
+    fixed = game.register_or_pitch("#SaintAlgorithm #11am\nStill holy.", 3, "C", 4)
+    assert fixed.school["section"] == "11am" and "11am" in fixed.message
+    # A plain later pitch leaves the section alone and stays quiet
+    later = game.register_or_pitch("#SaintAlgorithm\nEven holier.", 3, "C", 5)
+    assert later.school["section"] == "11am" and later.message == ""
+    # A section tag alone isn't a university
+    assert not game.register_or_pitch("#10am\nWhich school?", 4, "D", 6).ok
+
+
+def test_winner_draw_rewards_posts_within_each_section(tmp_path):
+    db, game = new_game(tmp_path, seed=3)
+    game.open_round("welcome")
+    game.register_or_pitch("#BusyU #10am\nBusy.", 1, "A", 1)
+    game.register_or_pitch("#QuietU #10am\nQuiet.", 2, "B", 2)
+    game.register_or_pitch("#OnlyU #1pm\nOnly.", 3, "C", 3)
+    game.register_or_pitch("#GuestU\nFriend of the show.", 4, "D", 4)
+    for i in range(9):
+        game.file_policy(f"#BusyU Robots run department {i}.", 1, "A", 100 + i)
+    wins = {"BusyU": 0, "Quiet U": 0}
+    names = {"Busy U": "BusyU", "Quiet U": "Quiet U"}
+    for _ in range(300):
+        draw = game.draw_winners()
+        wins[names[draw["sections"]["10am"]["winner"]["name"]]] += 1
+        assert draw["sections"]["1pm"]["winner"]["name"] == "Only U"
+        assert draw["sections"]["11am"]["winner"] is None
+        assert draw["guests"] == ["Guest U"]
+    assert wins["BusyU"] > 240 and wins["Quiet U"] > 5      # 10 tickets to 1: favored, but not certain
+
+    # What gets announced is the draw that was shown, once
+    shown = game.draw_winners()
+    report, winner = game.draw_report(shown), shown["sections"]["10am"]["winner"]["name"]
+    assert winner in report and "91%" in report and "Guest U" in report
+    assert game.saved_draw() == shown
+    text = game.draw_announcement(game.saved_draw())
+    assert winner in text and "Guest U" not in text and "11am" not in text
+    game.clear_draw()
+    assert game.saved_draw() is None
+
+
+def test_older_game_gets_the_section_column(tmp_path):
+    path = tmp_path / "old.db"
+    db = Database(path)
+    db.conn.execute("ALTER TABLE schools DROP COLUMN section")
+    db.conn.commit()
+    db.conn.close()
+    reopened = Database(path)
+    assert "section" in [r["name"] for r in reopened.conn.execute("PRAGMA table_info(schools)")]
+
+
 def test_lone_university_gets_a_generic_rival(tmp_path):
     from bot import engine
 

@@ -18,6 +18,9 @@ KIND_TAGS = {
 }
 KINDS = ["Policy", "Amendment", "Extreme Measure", "Graduation Speech"]
 
+# Class sections. A university's first pitch can say which one it belongs to; guests just leave it off.
+SECTIONS = ("10am", "11am", "1pm")
+
 
 def squash(text: str) -> str:
     return "".join(ch for ch in (text or "").lower().lstrip("#") if ch.isalnum())
@@ -106,6 +109,17 @@ def pitch_text(text: str) -> str:
     """A pitch without its Name:, Mascot: and similar lines, which are shown separately."""
     lines = [line for line in (text or "").split("\n") if not FIELD.match(line)]
     return "\n".join(lines).strip()
+
+
+def split_section(tags: list[str]) -> tuple[str | None, list[str]]:
+    """Pulls a class section tag (#10am, #11am, #1pm) out of a post's hashtags, wherever it sits."""
+    section, rest = None, []
+    for tag in tags:
+        if squash(tag) in SECTIONS:
+            section = section or squash(tag)
+        else:
+            rest.append(tag)
+    return section, rest
 
 
 def policy_kind(tags: list[str]) -> str | None:

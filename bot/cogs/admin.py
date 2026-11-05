@@ -12,6 +12,7 @@ from discord.ext import commands
 
 from .. import ai, config, tables
 from ..engine import ALL_STATS, STAT_LABELS
+from ..parsing import SECTIONS
 from .common import parse_policy_ref, reply, school_autocomplete
 
 STAT_CHOICES = [app_commands.Choice(name=STAT_LABELS[s], value=s) for s in ALL_STATS]
@@ -105,16 +106,21 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
                                              f"struck down. {reason}")
         await reply(interaction, "Struck down.")
 
-    @app_commands.command(name="school", description="Fix a university's name, ticker or mascot.")
+    @app_commands.command(name="school", description="Fix a university's name, ticker, mascot or class section.")
     @app_commands.autocomplete(university=school_autocomplete)
+    @app_commands.choices(section=[app_commands.Choice(name=s, value=s) for s in SECTIONS]
+                          + [app_commands.Choice(name="Guest (no section)", value="guest")])
     async def school(self, interaction: discord.Interaction, university: str, name: str | None = None,
-                     ticker: str | None = None, mascot: str | None = None):
+                     ticker: str | None = None, mascot: str | None = None,
+                     section: app_commands.Choice[str] | None = None):
         db = self.bot.db
         school = db.find_school(university)
         if school is None:
             return await reply(interaction, "I couldn't find that university.")
         updates = {k: v for k, v in (("name", name), ("code", ticker.upper() if ticker else None),
                                      ("mascot", mascot)) if v}
+        if section:
+            updates["section"] = None if section.value == "guest" else section.value
         if not updates:
             return await reply(interaction, "Nothing to change.")
         if "code" in updates and any(s["code"] == updates["code"] and s["id"] != school["id"] for s in db.schools()):
@@ -184,6 +190,19 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
                             "ranking, reweighted the vibes, and rounded in all directions.\n\n"
                             f"🏆 Your champion: **{audit[0]['name']}** ({audit[0]['code']})!\n\n" + "\n".join(lines))
         await reply(interaction, "Verdict announced.")
+
+    @app_commands.command(name="winners", description="Draw a winning university for each class section.")
+    @app_commands.describe(announce="Post the draw you already saw, instead of drawing again")
+    async def winners(self, interaction: discord.Interaction, announce: bool = False):
+        game = self.bot.game
+        if not announce:
+            return await reply(interaction, game.draw_report(game.draw_winners()))
+        draw = game.saved_draw()
+        if draw is None:
+            return await reply(interaction, "No draw to announce. Run /admin winners first.")
+        await self.bot.post("announcements", game.draw_announcement(draw))
+        game.clear_draw()
+        await reply(interaction, "Winners announced.")
 
     # ---- exports -------------------------------------------------------------
     @app_commands.command(name="participation", description="Download a participation report for grading.")

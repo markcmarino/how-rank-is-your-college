@@ -119,6 +119,7 @@ class Game:
         """A post in College Fair Pitches. The first post with a new hashtag registers the university."""
         db = self.db
         tags, body = parsing.leading_tags(content)
+        section, tags = parsing.split_section(tags)
         if not tags:
             return Filed(False, "🎪 Start your pitch with your university's hashtag, like `#TaukTechU`.")
         tag = tags[0]
@@ -134,23 +135,31 @@ class Game:
             name = fields.pop("name", None) or parsing.split_camel(tag)
             code = parsing.ticker_for(tag, {s["code"] for s in db.schools()})
             school_id = db.add_school(tag, name, code, self.new_school_stats(), **fields)
-            db.update_school(school_id, pitch=body)
+            db.update_school(school_id, pitch=body, section=section)
         else:
             school_id = school["id"]
             updates = {k: v for k, v in fields.items() if k != "name"}
             if fields.get("name"):
                 updates["name"] = fields["name"]
             pitch = ((school["pitch"] or "") + "\n\n" + body).strip()
+            if section:
+                updates["section"] = section
             db.update_school(school_id, pitch=pitch, **updates)
         db.add_member(user_id, school_id, user_name)
         db.add_post(user_id, user_name, school_id, "pitch", self._round_key(posted_at), len(body.split()), message_id,
                     _stamp(posted_at))
+        moved = not new and section and section != school["section"]
         school = db.school(school_id)
         if new:
+            note = (f"Class section: **{section}**." if section else
+                    f"In a class section? Post #{school['hashtag']} again with `#10am`, `#11am` or `#1pm`. "
+                    f"Guests can ignore this.")
             return Filed(True, f"🏛️ **{school['name']}** is now listed on the UnderAcademy Exchange as "
                                f"**{school['code']}**. Use **#{school['hashtag']}** on all your posts. If the name "
-                               f"looks wrong, post your hashtag again with a line like `Name: Tauk Tech University`.",
-                          school, True)
+                               f"looks wrong, post your hashtag again with a line like `Name: Tauk Tech University`. "
+                               f"{note}", school, True)
+        if moved:
+            return Filed(True, f"🏛️ **{school['name']}** is now in the **{section}** class section.", school)
         return Filed(True, "", school)
 
     def _school_from_tags(self, tags: list[str]) -> tuple[object, list[str], str | None]:
@@ -375,6 +384,56 @@ class Game:
         by_id = {r["id"]: r for r in rows}
         market = final_audit(schools, stats, self.data(), self.rng)
         return [{**m, "name": by_id[m["school_id"]]["name"], "code": by_id[m["school_id"]]["code"]} for m in market]
+
+    def draw_winners(self) -> dict:
+        """Draws one university per class section. Every filed post is one ticket in that section's draw.
+
+        Universities without a section (guests) and without posts aren't entered. The draw is saved, so the
+        one the game master saw is the one that gets announced.
+        """
+        rows = self.db.school_post_counts()
+        draw = {"sections": {}, "guests": [r["name"] for r in rows if not r["section"]]}
+        for section in parsing.SECTIONS:
+            field_ = [{"name": r["name"], "code": r["code"], "posts": r["posts"]}
+                      for r in rows if r["section"] == section and r["posts"] > 0]
+            winner = self.rng.choices(field_, weights=[f["posts"] for f in field_])[0] if field_ else None
+            draw["sections"][section] = {"winner": winner, "field": field_}
+        self.db.set("winners_draw", json.dumps(draw))
+        return draw
+
+    def saved_draw(self) -> dict | None:
+        saved = self.db.get("winners_draw")
+        return json.loads(saved) if saved else None
+
+    def clear_draw(self) -> None:
+        self.db.set("winners_draw", "")
+
+    @staticmethod
+    def draw_report(draw: dict) -> str:
+        """The private version, with everyone's posts and odds."""
+        lines = ["**Winner draw (private).** Each post is one ticket."]
+        for section, result in draw["sections"].items():
+            lines.append(f"\n**{section}**")
+            if not result["winner"]:
+                lines.append("No universities with posts.")
+                continue
+            lines.append(f"🏆 Drawn: **{result['winner']['name']}** ({result['winner']['code']})")
+            total = sum(f["posts"] for f in result["field"])
+            lines += [f"• {f['name']}: {f['posts']} posts, {f['posts'] / total:.0%} chance" for f in result["field"]]
+        if draw["guests"]:
+            lines.append("\n**Not entered (no class section):** " + ", ".join(draw["guests"]))
+        lines.append("\nFix a section with `/admin school`, then draw again. Run `/admin winners` for a new draw, "
+                     "or `/admin winners announce:True` to post this one.")
+        return "\n".join(lines)
+
+    @staticmethod
+    def draw_announcement(draw: dict) -> str:
+        lines = ["🏆 **The Big Digit Conference has drawn its class champions.** Every post was a ticket, so the "
+                 "universities that wrote the most had the best odds.\n"]
+        for section, result in draw["sections"].items():
+            if result["winner"]:
+                lines.append(f"**{section}:** {result['winner']['name']} ({result['winner']['code']})")
+        return "\n".join(lines)
 
     # ---- admin tools and exports --------------------------------------------
     def decree(self, text: str, school_id: int | None, stat: str | None, amount: float) -> None:

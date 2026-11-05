@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS schools (
     code TEXT NOT NULL UNIQUE,             -- ticker symbol, e.g. TTU
     location TEXT, specialties TEXT, reputation TEXT, colors TEXT, mascot TEXT, motto TEXT,
     pitch TEXT,
+    section TEXT,                          -- class section (10am, 11am, 1pm); empty for guests
     created_at TEXT
 );
 -- Who has posted for which university (a player can post for more than one)
@@ -118,6 +119,9 @@ class Database:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.executescript(SCHEMA)
+        # A game started before class sections existed gets the new column; its data is untouched
+        if "section" not in [row["name"] for row in self.conn.execute("PRAGMA table_info(schools)")]:
+            self.conn.execute("ALTER TABLE schools ADD COLUMN section TEXT")
         self.conn.commit()
 
     def _run(self, sql: str, args=()) -> sqlite3.Cursor:
@@ -290,6 +294,12 @@ class Database:
             "SUM(p.words) AS words, MIN(p.created_at) AS first_post, MAX(p.created_at) AS last_post "
             "FROM posts p LEFT JOIN schools s ON s.id = p.school_id "
             "GROUP BY p.user_id, p.school_id, p.kind, p.round ORDER BY user_name").fetchall()
+
+    def school_post_counts(self) -> list[sqlite3.Row]:
+        """Every university with its section and its number of filed posts, most posts first."""
+        return self.conn.execute("SELECT s.id, s.name, s.code, s.section, COUNT(p.id) AS posts FROM schools s "
+                                 "LEFT JOIN posts p ON p.school_id = s.id GROUP BY s.id "
+                                 "ORDER BY posts DESC, s.name").fetchall()
 
     # ---- votes ---------------------------------------------------------
     def cast_vote(self, user_id: int, user_name: str, school_id: int) -> None:

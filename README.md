@@ -16,6 +16,8 @@ Players don't need any commands. They just post, starting with hashtags, and the
 | #policies-rank | `#TaukTechU` then the policy | Files it as the current round's kind (Policy, Amendment, Extreme Measure, Graduation Speech), guesses its domain from keywords, and prices it in at the next closing bell. 📜 |
 | #secret-diary-rank | `#Ellen #groundskeeper #TaukTechU` then the entry | Files it as evidence for the next closing bell. 📓 |
 
+- **In a class?** Add `#10am`, `#11am` or `#1pm` to the university's first pitch, or to a later pitch if you forgot.
+  Guests leave it off and aren't entered in the class winner draw. `/admin school` can correct a section.
 - **Misspelled hashtag?** The bot replies "Did you mean #TaukTechU?" A genuinely new university that looks like
   an existing one can add `#new` to its first pitch.
 - **Catching up?** Add a round tag, such as `#round1`, `#welcomeweek`, `#midterms`, `#finals` or `#epilogue`, and
@@ -37,6 +39,8 @@ Lookup commands for anyone: `/rankings`, `/report`, `/policies`, `/policy TTU-3`
 - **The finale**, whenever you like (including for groups playing out of season): `/admin vote open`, then
   `/admin vote close` to announce the people's champion (players can't vote for a university they posted for),
   or `/admin verdict` to crown a winner from the rankings after a randomized Final Audit.
+- **Class winners:** `/admin winners` privately draws one university for each class section, with one ticket per
+  filed post, and shows everyone's odds. Run it again to redraw, then use `announce:True` to post that draw.
 - **Grading:** `/admin participation` downloads a spreadsheet with one row per player: total posts and words,
   counts by kind and by round, and first and last post dates.
 - **Backups:** the bot saves a dated copy of the database in a `backups` folder beside it each night and keeps two

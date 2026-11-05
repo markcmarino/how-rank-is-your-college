@@ -6,7 +6,7 @@ players with solo universities, play publicly from about Nov 9 to Nov 21, 2026, 
 
 Players play by posting with hashtags; there are no player slash commands for playing. The bot ranks universities
 nightly as stocks on the "UnderAcademy Exchange" and publishes a public page, the "US Snooze & Whirled Retort".
-The winner is chosen at the end by a player vote or by `/admin verdict` (rankings plus a random Final Audit).
+Class winners are drawn with `/admin winners`: one university per section (#10am, #11am, #1pm), one ticket per post. A player vote and `/admin verdict` (rankings plus a random Final Audit) also remain available.
 
 ## Layout
 
