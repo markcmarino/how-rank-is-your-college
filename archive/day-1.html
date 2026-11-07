@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>US Snooze &amp; Whirled Retort</title>
+<meta name="description" content="Rankings of the Big Digit Conference, as traded on the UnderAcademy Exchange.">
+<style>
+:root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf;
+  --s0:#2a78d6; --s1:#eb6834; --s2:#1baf7a; --s3:#eda100; --s4:#e87ba4; --s5:#008300; --s6:#6250d6; --s7:#e34948; --pack:#d9d1c3; }
+@media (prefers-color-scheme: dark) { :root { --paper:#17150f; --ink:#ece6da; --muted:#a59c8e; --rule:#3a352c; --accent:#e0705f; --up:#6fcf8f; --down:#ff8a7a; --band:#211e17;
+  --s0:#3987e5; --s1:#d95926; --s2:#199e70; --s3:#c98500; --s4:#d55181; --s5:#008300; --s6:#9085e9; --s7:#e66767; --pack:#3a352c; } }
+* { box-sizing:border-box; }
+.chart { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.chart h3 { margin-bottom:4px; }
+.chart .note { margin:0 0 8px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.chart svg { display:block; width:100%; height:auto; }
+.chart text { font:14px system-ui, sans-serif; fill:var(--muted); }
+.chart text.end { fill:var(--ink); font-weight:700; }
+.chart .grid-line { stroke:var(--rule); stroke-width:1; }
+.chart .series { fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.chart .pack { fill:none; stroke:var(--pack); stroke-width:1; stroke-linejoin:round; }
+.chart .hit { fill:transparent; }
+.chart .dot { stroke:var(--paper); stroke-width:2; }
+.trend { width:72px; padding-left:8px; padding-right:8px; }
+.trend svg { display:block; width:64px; height:20px; }
+.trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+.reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
+.review { min-width:0; overflow-wrap:anywhere; }
+.review h4 { margin:0; font-size:21px; line-height:1.2; }
+.review .standing { display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:6px 0 10px !important; font-size:14px; }
+.review .standing svg { width:80px; height:25px; flex:none; }
+.review blockquote { margin:0 0 8px; }
+.review .more { font:13px/1.4 system-ui, sans-serif; }
+.legend { display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:8px; font:13px/1.4 system-ui, sans-serif; }
+.legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+@media (max-width:560px) { .chart text { font-size:24px; } }
+.lead .chart { padding:14px 0 0; border-bottom:0; max-width:520px; }
+a { color:var(--accent); text-underline-offset:2px; }
+a:hover { text-decoration-thickness:2px; }
+td a, .who a { font-weight:700; }
+.schools { border-bottom:1px solid var(--rule); padding:8px 0; font:14px/1.4 system-ui, sans-serif; }
+.schools summary { cursor:pointer; font-weight:700; color:var(--accent); }
+.schools div { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:6px 16px; padding-top:10px; }
+.masthead h1 a { text-decoration:none; color:inherit; }
+.days { display:flex; flex-wrap:wrap; gap:6px 14px; border-bottom:1px solid var(--rule); padding:8px 0;
+  font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.section { padding-top:20px; }
+.grid > section { min-width:0; }
+.body { white-space:pre-line; }
+.story, blockquote { overflow-wrap:anywhere; }
+.standing { margin:10px 0 0 !important; font:15px/1.4 system-ui, sans-serif; }
+.lead p.tag { margin:0; font:14px/1.4 system-ui, sans-serif; }
+.facts { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px 24px; margin:14px 0 0; }
+.facts dt { font:600 12px/1.4 system-ui, sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.facts dd { margin:0; }
+blockquote ul { margin:6px 0 0; padding-left:18px; font:normal 13px/1.45 system-ui, sans-serif; color:var(--muted); }
+body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.55 Georgia, "Times New Roman", serif; }
+.wrap { max-width:960px; margin:0 auto; padding:24px 16px 64px; }
+.masthead { text-align:center; border-bottom:3px double var(--ink); padding-bottom:12px; }
+.masthead .over { font:600 12px/1.4 system-ui, sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.masthead h1 { font-size:clamp(34px, 7vw, 64px); line-height:1; margin:8px 0 6px; font-weight:700; letter-spacing:-.01em; }
+.dateline { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; border-bottom:1px solid var(--rule);
+  padding:8px 0; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+.ticker { overflow-x:auto; white-space:nowrap; border-bottom:1px solid var(--rule); padding:8px 0;
+  font:13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+.ticker span { margin-right:22px; }
+.up { color:var(--up); } .down { color:var(--down); }
+.lead { padding:20px 0; border-bottom:1px solid var(--rule); }
+.lead h2 { font-size:clamp(24px, 4vw, 36px); line-height:1.15; margin:0 0 10px; }
+.lead p { margin:0; font-size:19px; }
+.grid { display:grid; grid-template-columns:1.4fr 1fr; gap:32px; padding-top:20px; }
+@media (max-width:860px) { .grid { grid-template-columns:1fr; } }
+h3 { font:700 13px/1.3 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+  border-top:2px solid var(--ink); padding-top:8px; margin:0 0 12px; }
+table { width:100%; border-collapse:collapse; font:15px/1.4 system-ui, sans-serif; }
+th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted);
+  border-bottom:1px solid var(--rule); padding:6px 4px; }
+td { border-bottom:1px solid var(--rule); padding:8px 4px; vertical-align:top; }
+td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.move { font-size:12px; white-space:nowrap; margin-left:4px; }
+tr:nth-child(even) td { background:var(--band); }
+.tag { color:var(--muted); font-size:13px; }
+.story { margin:0 0 16px; padding-bottom:14px; border-bottom:1px solid var(--rule); }
+.story:last-child { border-bottom:0; }
+.story .who { font:600 12px/1.4 system-ui, sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+blockquote { margin:0 0 16px; padding:0 0 0 14px; border-left:3px solid var(--accent); font-style:italic; }
+blockquote cite { display:block; font:normal 13px/1.4 system-ui, sans-serif; color:var(--muted); margin-top:4px; }
+footer { margin-top:40px; border-top:3px double var(--ink); padding-top:12px; font:13px/1.5 system-ui, sans-serif; color:var(--muted); text-align:center; }
+</style></head>
+<body><div class="wrap">
+<header class="masthead"><div class="over">The UnderAcademy Exchange presents</div>
+<h1><a href="../index.html">US Snooze &amp; Whirled Retort</a></h1>
+<div class="over">Big Digit Conference Rankings · How Rank is Your College?</div></header>
+<div class='dateline'><span>Saturday, November 7, 2026</span><span>Trading Day 1</span><span>Round 1: Welcome Week</span></div>
+<div class="ticker"><span>TTU $131.62 <b class=''>■ 0.0%</b></span><span>CT $130.72 <b class=''>■ 0.0%</b></span><span>AITA $126.80 <b class=''>■ 0.0%</b></span><span>MICAT $125.97 <b class=''>■ 0.0%</b></span><span>UA $125.17 <b class=''>■ 0.0%</b></span><span>USS $124.43 <b class=''>■ 0.0%</b></span><span>UONC $123.98 <b class=''>■ 0.0%</b></span><span>UU $123.70 <b class=''>■ 0.0%</b></span><span>BT $123.58 <b class=''>■ 0.0%</b></span><span>LU $123.07 <b class=''>■ 0.0%</b></span><span>UNIJ $122.62 <b class=''>■ 0.0%</b></span><span>AC $121.60 <b class=''>■ 0.0%</b></span><span>GU $118.73 <b class=''>■ 0.0%</b></span></div>
+<nav class='days'><a href='../index.html'>Latest edition</a></nav>
+<details class='schools'><summary>All universities (13)</summary><div><a href='../university/ac.html'>AC</a><a href='../university/aita.html'>AITA</a><a href='../university/baytech.html'>BayTech</a><a href='../university/cloudtech.html'>Cloud Tech</a><a href='../university/grindu.html'>Grind U</a><a href='../university/luminau.html'>Lumina U</a><a href='../university/midnightinstituteofcommunityaccessteaching.html'>Midnight Institute of Community Access Teaching</a><a href='../university/tauktechu.html'>Tauk Tech U</a><a href='../university/uncuni.html'>Unc Uni</a><a href='../university/unijoy.html'>University of Almond Joys</a><a href='../university/universityofnortherncalifornia.html'>University of Northern California</a><a href='../university/uoa.html'>Uo A</a><a href='../university/uss.html'>USS</a></div></details>
+<section class='chart'><h3>The Exchange: Top Five</h3><p class='note'>Insufficient data. Analysts remain confident.</p></section>
+<section class="lead"><h2>Tauk Tech U Holds Steady 0.0% on the UnderAcademy Exchange</h2><p>A slow day on the Exchange. Even AI Corpone took a nap.</p></section>
+<section class='reviews'><h3>University Under Review</h3><p class='note'>Each edition, the Retort's auditors visit another corner of the Conference. Every university's turn will come.</p><div class='review-grid'><article class='review'><h4><a href='../university/tauktechu.html'>Tauk Tech U</a></h4><p class='standing'><span>Rank 1 of 13 · $131.62 <b class=''>■ 0.0%</b></span></p><blockquote>So I just had my first meeting for my civil engineering research job. The job listing describes the job location as being Appleseed Library but the meeting turned out to be just standing in front of the library. Instead...<cite>Sanya, student, in a Secret Diary</cite></blockquote><a class='more' href='../university/tauktechu.html'>Read the full file</a></article><article class='review'><h4><a href='../university/universityofnortherncalifornia.html'>University of Northern California</a></h4><p class='standing'><span>Rank 7 of 13 · $123.98 <b class=''>■ 0.0%</b></span></p><blockquote>Academic Specialties: Environmental Science, Geology Slogan: &quot;Ride On&quot;, or more informally, &quot;Let It Ride&quot; Academic Specialties: Environmental Science, Geology Slogan: &quot;Play and Go Deep&quot;<cite>College Fair Pitch</cite></blockquote><a class='more' href='../university/universityofnortherncalifornia.html'>Read the full file</a></article></div></section>
+<div class="grid">
+<section><h3>The Rankings</h3><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
+<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody><tr><td class='num'>1</td><td><a href='../university/tauktechu.html'>Tauk Tech U</a> <span class='tag'>#TaukTechU</span><span class='move '></span></td><td>TTU</td><td class='num'>$131.62</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>2</td><td><a href='../university/cloudtech.html'>Cloud Tech</a> <span class='tag'>#CloudTech</span><span class='move '></span></td><td>CT</td><td class='num'>$130.72</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>3</td><td><a href='../university/aita.html'>AITA</a> <span class='tag'>#AITA</span><span class='move '></span></td><td>AITA</td><td class='num'>$126.80</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>4</td><td><a href='../university/midnightinstituteofcommunityaccessteaching.html'>Midnight Institute of Community Access Teaching</a> <span class='tag'>#MidnightInstituteofCommunityAccessTeaching</span><span class='move '></span></td><td>MICAT</td><td class='num'>$125.97</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>5</td><td><a href='../university/uoa.html'>Uo A</a> <span class='tag'>#UoA</span><span class='move '></span></td><td>UA</td><td class='num'>$125.17</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>6</td><td><a href='../university/uss.html'>USS</a> <span class='tag'>#USS</span><span class='move '></span></td><td>USS</td><td class='num'>$124.43</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>7</td><td><a href='../university/universityofnortherncalifornia.html'>University of Northern California</a> <span class='tag'>#UniversityOfNorthernCalifornia</span><span class='move '></span></td><td>UONC</td><td class='num'>$123.98</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>8</td><td><a href='../university/uncuni.html'>Unc Uni</a> <span class='tag'>#UncUni</span><span class='move '></span></td><td>UU</td><td class='num'>$123.70</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>9</td><td><a href='../university/baytech.html'>BayTech</a> <span class='tag'>#BayTech</span><span class='move '></span></td><td>BT</td><td class='num'>$123.58</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>10</td><td><a href='../university/luminau.html'>Lumina U</a> <span class='tag'>#LuminaU</span><span class='move '></span></td><td>LU</td><td class='num'>$123.07</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>11</td><td><a href='../university/unijoy.html'>University of Almond Joys</a> <span class='tag'>#unijoy</span><span class='move '></span></td><td>UNIJ</td><td class='num'>$122.62</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>12</td><td><a href='../university/ac.html'>AC</a> <span class='tag'>#AC</span><span class='move '></span></td><td>AC</td><td class='num'>$121.60</td><td class='num '>■ 0.0%</td></tr><tr><td class='num'>13</td><td><a href='../university/grindu.html'>Grind U</a> <span class='tag'>#GrindU</span><span class='move '></span></td><td>GU</td><td class='num'>$118.73</td><td class='num '>■ 0.0%</td></tr></tbody></table></section>
+<section><h3>Top Stories</h3><div class='story'><div class='who'><a href='../university/tauktechu.html'>Tauk Tech U</a></div>OFFICE OF REGRESSION TO THE MEAN: Tauk Tech U has been featured in a documentary titled &quot;Too Big to Grade.&quot;</div><div class='story'><div class='who'><a href='../university/uoa.html'>Uo A</a></div>OFFICE OF REGRESSION TO THE MEAN: A billionaire has donated a building to Uo A that nobody asked for. Upkeep begins immediately.</div><div class='story'><div class='who'><a href='../university/tauktechu.html'>Tauk Tech U</a></div>The campus tour now includes a stop explaining &quot;In response to shortening attention spans, TaukTechU has replaced...&quot;. Tour guides walk faster at that stop.</div><div class='story'><div class='who'><a href='../university/tauktechu.html'>Tauk Tech U</a></div>The Writing Center reports that &quot;Only robots may attend class&quot; has generated a record number of essays and a record low number of writers.</div></section>
+</div>
+<div class="grid">
+<section><h3>Overheard in the Secret Diaries</h3><div class='story'><div class='who'><a href='../university/tauktechu.html'>Tauk Tech U</a></div>Sources close to Tauk Tech U shared this from Tanner, student: &quot;I managed to learn the basics about the Scottish Enlightenment today – Hume, Smith, Hutton, Watt – and I almost got busted for it. Since...&quot; The administration declined to comment, then commented.</div></section>
+<section><h3>From the Policy Register</h3><blockquote>Only robots may attend class. Boon: This should boost our flagging data-transfer numbers (formerly: “achievement of learning objectives” numbers), as well as...<cite>TTU-1, Policy, <a href='../university/tauktechu.html'>Tauk Tech U</a></cite></blockquote><blockquote>In response to shortening attention spans, TaukTechU has replaced lectures with summaries, delivered by AI-generated fruit people in shortform vertical videos....<cite>TTU-2, Policy, <a href='../university/tauktechu.html'>Tauk Tech U</a></cite></blockquote></section>
+</div>
+<footer>A netprov. Any resemblance to real universities, living or dead, is purely coincidental.<br>
+Share prices are not financial advice. Nothing is.</footer>
+</div></body></html>
