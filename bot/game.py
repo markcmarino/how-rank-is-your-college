@@ -285,6 +285,17 @@ class Game:
         rnd = self._round_at(posted_at)
         return rnd["key"] if rnd else None
 
+    def team_sizes(self) -> dict[int, int]:
+        """Players per university: Discord accounts that made a character there, each counted once
+        however many characters they play. A school with no characters yet counts whoever has posted for it."""
+        q = self.db.conn.execute
+        sizes = {r[0]: r[1] for r in q("SELECT school_id, COUNT(DISTINCT author_id) FROM characters "
+                                       "WHERE author_id IS NOT NULL GROUP BY school_id")}
+        for sid, n in q("SELECT school_id, COUNT(DISTINCT user_id) FROM posts WHERE school_id IS NOT NULL "
+                        "GROUP BY school_id"):
+            sizes.setdefault(sid, n)
+        return sizes
+
     # ---- the market close ------------------------------------------------
     async def close(self) -> CloseReport:
         """Computes the next day without saving it. Call commit() to make it official."""
@@ -306,7 +317,8 @@ class Game:
         if ai.enabled(self.mode):
             ai_results = await self._ask_ai(schools, by_id, new_rows, diary_rows, data)
 
-        result = run_day(schools, new_policies, diaries, active, data, self.rng, ai_results)
+        result = run_day(schools, new_policies, diaries, active, data, self.rng, ai_results,
+                         team_sizes=self.team_sizes())
 
         prev = db.snapshot(day - 1)
         market_rows = []

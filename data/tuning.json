@@ -41,6 +41,12 @@
     "base_severity": 2,
     "severity_per_deficit": 6
   },
+  "team_size": {
+    "_note": "Each post counts in proportion to team size (Discord accounts with a character). An average-sized team counts each post once; weights stay between min and max.",
+    "enabled": true,
+    "min_weight": 0.25,
+    "max_weight": 4.0
+  },
   "diaries": {
     "buzz_per_entry": 0.5,
     "max_buzz_per_day": 3,

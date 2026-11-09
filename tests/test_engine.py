@@ -9,7 +9,8 @@ from types import SimpleNamespace
 from bot import config, parsing, site
 from bot.cogs.posts import Posts
 from bot.db import Database
-from bot.engine import AIResults, Interpretation, NewPolicy, School, load_data, run_day, starting_stats
+from bot.engine import (AIResults, Interpretation, NewPolicy, School, load_data, run_day, starting_stats,
+                        team_weights)
 from bot.game import Game
 from scripts.simulate import NAMES
 
@@ -489,3 +490,30 @@ def test_due_round(tmp_path):
     game.open_round("welcome")
     assert game.due_round(date(2026, 11, 12)) is None
     assert game.due_round(date(2026, 11, 18))["key"] == "finals"
+
+
+def test_posts_count_in_proportion_to_team_size(tmp_path):
+    data, rng = load_data(), random.Random(0)
+    schools = make_schools(3, data, rng)
+    weights = team_weights(schools, {1: 8, 2: 2, 3: 2}, data["tuning"])   # average team is 4
+    assert weights == {1: 0.5, 2: 2.0, 3: 2.0}
+    assert 8 * weights[1] == 2 * weights[2]                    # eight posts from eight players = two from two
+    assert team_weights(schools, {1: 40, 2: 1, 3: 1}, data["tuning"])[2] == 4.0   # capped by max_weight
+    assert set(team_weights(schools, None, data["tuning"]).values()) == {1.0}
+    # The same policy moves a small team further than a big one
+    ai = AIResults(policies={1: Interpretation({"bureaucracy": 10}, "x"), 2: Interpretation({"bureaucracy": 10}, "y")})
+    before = {s.id: s.stats["bureaucracy"] for s in schools}
+    result = run_day(schools, [NewPolicy(1, 1, 1, "A", None), NewPolicy(2, 2, 1, "B", None)], [], {}, data,
+                     random.Random(1), ai, team_sizes={1: 8, 2: 2, 3: 2})
+    assert result.stats[2]["bureaucracy"] - before[2] > 3 * (result.stats[1]["bureaucracy"] - before[1])
+
+    # Team size is Discord accounts with a character there, once each however many characters they play
+    db, game = new_game(tmp_path, seed=2)
+    game.open_round("welcome")
+    game.register_or_pitch("#TaukTechU\nA fine institution.", 1, "Rob", 10)
+    game.register_or_pitch("#LakeHubris\nAnother.", 5, "Solo", 11)
+    for i, (user, name) in enumerate([(1, "Ada"), (1, "Bea"), (1, "Cy"), (2, "Dot"), (3, "Ed")]):
+        assert game.file_character(f"#{name} #student #TaukTechU\nHere.", user, f"P{user}", 20 + i).ok
+    sizes = game.team_sizes()
+    assert sizes[db.find_school("TaukTechU")["id"]] == 3       # Rob's three characters still count as one player
+    assert sizes[db.find_school("LakeHubris")["id"]] == 1      # no characters yet: whoever has posted

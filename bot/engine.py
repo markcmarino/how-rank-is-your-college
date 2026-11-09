@@ -168,15 +168,33 @@ def _quote(title: str) -> str:
 
 # ---- the market close -------------------------------------------------------
 
+def team_weights(schools: list[School], team_sizes: dict[int, int] | None, tuning: dict) -> dict[int, float]:
+    """How much one post counts for each school, so big teams don't win on sheer numbers.
+
+    team_sizes maps school id to the number of Discord accounts on that team. A school's weight is the
+    average team size divided by its own, so an average team counts each post once, a team twice the
+    average counts each post half, and the overall amount of change in the game stays the same.
+    """
+    t = tuning.get("team_size", {})
+    if not team_sizes or not t.get("enabled", True):
+        return {s.id: 1.0 for s in schools}
+    sizes = {s.id: max(1, team_sizes.get(s.id, 1)) for s in schools}
+    average = sum(sizes.values()) / len(sizes)
+    low, high = t.get("min_weight", 0.25), t.get("max_weight", 4.0)
+    return {sid: min(high, max(low, average / size)) for sid, size in sizes.items()}
+
+
 def run_day(schools: list[School], new_policies: list[NewPolicy], diaries: list[Diary],
             active_titles: dict[int, list[tuple[int, str]]], data: dict, rng: random.Random,
-            ai: AIResults | None = None) -> DayResult:
+            ai: AIResults | None = None, team_sizes: dict[int, int] | None = None) -> DayResult:
     """Runs one day.
 
     active_titles maps school id to (policy id, title) for every Active policy, used for
-    accreditation visits. `ai` overrides the tables wherever it has an answer.
+    accreditation visits. `ai` overrides the tables wherever it has an answer. team_sizes
+    (school id to number of players) makes each post count in proportion to team size.
     """
     tuning = data["tuning"]
+    weight = team_weights(schools, team_sizes, tuning)
     ai = ai or AIResults()
     by_id = {s.id: s for s in schools}
     stats = {s.id: dict(s.stats) for s in schools}
@@ -190,23 +208,23 @@ def run_day(schools: list[School], new_policies: list[NewPolicy], diaries: list[
         school = by_id.get(p.school_id)
         if school is None:
             continue
-        st = stats[p.school_id]
+        st, w = stats[p.school_id], weight.get(p.school_id, 1.0)
         dampen = st["bureaucracy"] * ptune["bureaucracy_dampens_gains"]
         if p.id in ai.policies:
             interp = ai.policies[p.id]
-            _apply(st, interp.effects, dampen=dampen)
+            _apply(st, interp.effects, scale=w, dampen=dampen)
             text = interp.text
         else:
             domain = p.domain if p.domain in domains else rng.choice(list(domains))
             spread = ptune["roll_spread"] + st["chaos"] * ptune["chaos_widens_spread"]
             roll = rng.uniform(1 - spread, 1 + spread)   # a big spread can make a policy backfire
-            _apply(st, domains[domain]["effects"], scale=roll, dampen=dampen)
+            _apply(st, domains[domain]["effects"], scale=roll * w, dampen=dampen)
             rival = _rival(school, schools, rng)
             text = fill(_consequence_line(p, domain, data, rng), data, rng, school=school.name,
                         mascot=school.mascot, policy=_quote(p.title), rival=rival.name if rival else None)
         bump = ptune["bureaucracy_per_policy"] if p.kind == "Policy" else ptune["bureaucracy_per_amendment"]
-        st["bureaucracy"] += bump
-        st["chaos"] += ptune["chaos_per_policy"]
+        st["bureaucracy"] += bump * w
+        st["chaos"] += ptune["chaos_per_policy"] * w
         events.append(Event(p.school_id, "policy", text, policy_id=p.id))
 
     # 2. Secret Diaries as evidence
@@ -218,7 +236,8 @@ def run_day(schools: list[School], new_policies: list[NewPolicy], diaries: list[
         if school_id not in stats:
             continue
         school, st = by_id[school_id], stats[school_id]
-        st["prestige"] += min(len(entries) * dtune["buzz_per_entry"], dtune["max_buzz_per_day"])
+        st["prestige"] += min(len(entries) * dtune["buzz_per_entry"] * weight.get(school_id, 1.0),
+                             dtune["max_buzz_per_day"])
         if school_id in ai.diaries:
             _apply(st, ai.diaries[school_id].effects)
             events.append(Event(school_id, "diary", ai.diaries[school_id].text))
