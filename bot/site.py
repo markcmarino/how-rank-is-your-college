@@ -102,6 +102,9 @@ td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-spac
 .move { font-size:12px; white-space:nowrap; margin-left:4px; }
 tr:nth-child(even) td { background:var(--band); }
 .tag { color:var(--muted); font-size:13px; }
+td .tag { overflow-wrap:anywhere; }
+td.name { overflow-wrap:anywhere; }
+.table-wrap { overflow-x:auto; }
 .story { margin:0 0 16px; padding-bottom:14px; border-bottom:1px solid var(--rule); }
 .story:last-child { border-bottom:0; }
 .story .who { font:600 12px/1.4 system-ui, sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
@@ -326,7 +329,7 @@ def build(db, game) -> dict[str, str]:
             return f"<td class='trend'>{_trend(history.get(r['school_id'], []), change(r)[1], r['code'])}</td>" if day > 1 else ""
 
         table = "".join(
-            f"<tr><td class='num'>{r['rank']}</td><td>{link(r['school_id'], r['name'])} "
+            f"<tr><td class='num'>{r['rank']}</td><td class='name'>{link(r['school_id'], r['name'])} "
             f"<span class='tag'>#{_e(r['hashtag'])}</span>"
             f"<span class='move {move_class(r)}'>{_e(reports.rank_move(r))}</span></td><td>{_e(r['code'])}</td>"
             f"{trend_cell(r)}<td class='num'>${r['price']:.2f}</td>"
@@ -389,8 +392,8 @@ def build(db, game) -> dict[str, str]:
 <section class="lead">{lead_html}</section>
 {reviews}
 <div class="grid">
-<section><h3>The Rankings</h3><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
-{'<th class="trend">Trend</th>' if day > 1 else ''}<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></section>
+<section><h3>The Rankings</h3><div class="table-wrap"><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
+{'<th class="trend">Trend</th>' if day > 1 else ''}<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></div></section>
 <section><h3>Top Stories</h3>{stories}</section>
 </div>
 <div class="grid">
