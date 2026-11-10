@@ -10,7 +10,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from .. import ai, config, tables
+from .. import ai, config, site, tables
 from ..engine import ALL_STATS, STAT_LABELS
 from ..parsing import SECTIONS
 from .common import parse_policy_ref, reply, school_autocomplete
@@ -77,9 +77,15 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
     @app_commands.command(name="retort", description="Rebuild and republish the public Retort page now.")
     async def retort(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True, thinking=True)
-        await self.bot.update_site()
-        await interaction.followup.send("The Retort has been rebuilt. GitHub Pages can take a minute or two to show "
-                                        "it; reload the page if you still see the old one.", ephemeral=True)
+        error = await self.bot.update_site()
+        if error:
+            return await interaction.followup.send(f"Couldn't rebuild the Retort. {error}", ephemeral=True)
+        if not (config.SITE_GITHUB_TOKEN and site.public_url()):
+            return await interaction.followup.send("Rebuilt the Retort locally, but publishing isn't set up "
+                                                   "(SITE_GITHUB_TOKEN and SITE_REPO).", ephemeral=True)
+        await interaction.followup.send("The Retort has been rebuilt. No day has passed. GitHub Pages can take a "
+                                        "minute or two to show it; reload the page if you still see the old one.\n"
+                                        f"{site.public_url()}", ephemeral=True)
 
     @app_commands.command(name="tables", description="Reload the lookup tables from the Google Sheet now.")
     async def reload_tables(self, interaction: discord.Interaction):

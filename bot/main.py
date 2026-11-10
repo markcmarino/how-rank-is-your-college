@@ -109,15 +109,18 @@ class RankBot(commands.Bot):
         if url:
             await self.post("exchange", f"📰 **Read the full story in the US Snooze & Whirled Retort:**\n{url}")
 
-    async def update_site(self) -> None:
+    async def update_site(self) -> str | None:
+        """Rebuilds the public page from the database and publishes it. Returns an error message, or None."""
         try:
             files = site.build(self.db, self.game)
             site.write_local(files)
             url = await self.loop.run_in_executor(None, site.publish, files)
             if url:
                 log.info("Published the US Snooze & Whirled Retort at %s", url)
-        except Exception:
+            return None
+        except Exception as exc:
             log.exception("Couldn't update the public rankings page")
+            return f"{type(exc).__name__}: {exc}"
 
     async def run_close(self) -> CloseReport | None:
         async with self.close_lock:
