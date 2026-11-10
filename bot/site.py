@@ -43,7 +43,7 @@ CSS = """
 .trend { width:72px; padding-left:8px; padding-right:8px; }
 .trend svg { display:block; width:64px; height:20px; }
 .trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
-@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+@media (max-width:560px) { .trend { display:none; } }
 .reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
 .reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
 .review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
@@ -391,15 +391,13 @@ def build(db, game) -> dict[str, str]:
 {chart}
 <section class="lead">{lead_html}</section>
 {reviews}
-<div class="grid">
-<section><h3>The Rankings</h3><div class="table-wrap"><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
+<section class="section rankings"><h3>The Rankings</h3><div class="table-wrap"><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
 {'<th class="trend">Trend</th>' if day > 1 else ''}<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></div></section>
-<section><h3>Top Stories</h3>{stories}</section>
-</div>
 <div class="grid">
+<section><h3>Top Stories</h3>{stories}</section>
 <section><h3>Overheard in the Secret Diaries</h3>{diary_html}</section>
-<section><h3>From the Policy Register</h3>{register}</section>
-</div>""")
+</div>
+<section class="section"><h3>From the Policy Register</h3>{register}</section>""")
 
     def school_menu(prefix: str) -> str:
         links = "".join(f"<a href='{prefix}university/{quote_url(_slug(s))}.html'>{_e(s['name'])}</a>"
