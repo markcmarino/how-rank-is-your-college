@@ -74,6 +74,13 @@ class Admin(commands.GroupCog, group_name="admin", group_description="Game-maste
         await self.bot.publish(report)
         await interaction.followup.send(f"Day {report.day} posted.", ephemeral=True)
 
+    @app_commands.command(name="retort", description="Rebuild and republish the public Retort page now.")
+    async def retort(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        await self.bot.update_site()
+        await interaction.followup.send("The Retort has been rebuilt. GitHub Pages can take a minute or two to show "
+                                        "it; reload the page if you still see the old one.", ephemeral=True)
+
     @app_commands.command(name="tables", description="Reload the lookup tables from the Google Sheet now.")
     async def reload_tables(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True, thinking=True)
