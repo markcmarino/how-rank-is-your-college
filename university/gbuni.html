@@ -22,7 +22,7 @@
 .trend { width:72px; padding-left:8px; padding-right:8px; }
 .trend svg { display:block; width:64px; height:20px; }
 .trend polyline, .review polyline { fill:none; stroke:var(--muted); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
-@media (max-width:560px), (min-width:861px) and (max-width:959px) { .trend { display:none; } }
+@media (max-width:560px) { .trend { display:none; } }
 .reviews { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
 .reviews .note { margin:0 0 12px; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
 .review-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px 32px; }
@@ -81,6 +81,9 @@ td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-spac
 .move { font-size:12px; white-space:nowrap; margin-left:4px; }
 tr:nth-child(even) td { background:var(--band); }
 .tag { color:var(--muted); font-size:13px; }
+td .tag { overflow-wrap:anywhere; }
+td.name { overflow-wrap:anywhere; }
+.table-wrap { overflow-x:auto; }
 .story { margin:0 0 16px; padding-bottom:14px; border-bottom:1px solid var(--rule); }
 .story:last-child { border-bottom:0; }
 .story .who { font:600 12px/1.4 system-ui, sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
@@ -92,11 +95,11 @@ footer { margin-top:40px; border-top:3px double var(--ink); padding-top:12px; fo
 <header class="masthead"><div class="over">The UnderAcademy Exchange presents</div>
 <h1><a href="../index.html">US Snooze &amp; Whirled Retort</a></h1>
 <div class="over">Big Digit Conference Rankings · How Rank is Your College?</div></header>
-<div class='dateline'><span>Tuesday, November 10, 2026</span><span>Trading Day 4</span><span>Round 1: Welcome Week</span></div>
+<div class='dateline'><span>Wednesday, November 11, 2026</span><span>Trading Day 5</span><span>Round 1: Welcome Week</span></div>
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
-<details class='schools'><summary>All universities (16)</summary><div><a href='../university/ac.html'>AC</a><a href='../university/aita.html'>AITA</a><a href='../university/baytech.html'>BayTech</a><a href='../university/cloudtech.html'>Cloud Tech</a><a href='../university/crazyschool.html'>Crazy School</a><a href='../university/goldenbayuni.html'>Golden Bay Uni</a><a href='../university/gbuni.html'>Golden Bay University. Class Section: 11am</a><a href='../university/grindu.html'>Grind U</a><a href='../university/luminau.html'>Lumina U</a><a href='../university/midnightinstituteofcommunityaccessteaching.html'>Midnight Institute of Community Access Teaching</a><a href='../university/tauktechu.html'>Tauk Tech U</a><a href='../university/uncuni.html'>Unc Uni</a><a href='../university/unijoy.html'>University of Almond Joys</a><a href='../university/universityofnortherncalifornia.html'>University of Northern California</a><a href='../university/uoa.html'>Uo A</a><a href='../university/uss.html'>USS</a></div></details>
+<details class='schools'><summary>All universities (18)</summary><div><a href='../university/ac.html'>AC</a><a href='../university/aita.html'>AITA</a><a href='../university/aitauniversity.html'>AITA University</a><a href='../university/baytech.html'>BayTech</a><a href='../university/cloudtech.html'>Cloud Tech</a><a href='../university/crazyschool.html'>Crazy School</a><a href='../university/goldenbayuni.html'>Golden Bay Uni</a><a href='../university/gbuni.html'>Golden Bay University. Class Section: 11am</a><a href='../university/grindu.html'>Grind U</a><a href='../university/luminau.html'>Lumina U</a><a href='../university/luminauniversity.html'>Lumina University</a><a href='../university/midnightinstituteofcommunityaccessteaching.html'>Midnight Institute of Community Access Teaching</a><a href='../university/tauktechu.html'>Tauk Tech U</a><a href='../university/uncuni.html'>Unc Uni</a><a href='../university/unijoy.html'>University of Almond Joys</a><a href='../university/universityofnortherncalifornia.html'>University of Northern California</a><a href='../university/uoa.html'>Uo A</a><a href='../university/uss.html'>USS</a></div></details>
 <section class="lead"><h2>Golden Bay University. Class Section: 11am</h2>
-<p class="tag">#GBUni</p><p class='standing'>Rank 6 of 16 · <b>GBU</b> $128.30 <b class=''>■ 0.0%</b></p></section>
+<p class="tag">#GBUni</p><p class='standing'>Rank 10 of 18 · <b>GBU</b> $127.65 <b class='down'>▼ 0.5%</b></p><div class='chart'><svg viewBox='0 0 640 240' role='img' aria-label='Golden Bay University. Class Section: 11am share price by trading day, now $127.65.'><line class='grid-line' x1='62' x2='528' y1='206.0' y2='206.0'/><text x='54' y='211.0' text-anchor='end'>$127</text><line class='grid-line' x1='62' x2='528' y1='109.0' y2='109.0'/><text x='54' y='114.0' text-anchor='end'>$128</text><line class='grid-line' x1='62' x2='528' y1='12.0' y2='12.0'/><text x='54' y='17.0' text-anchor='end'>$129</text><text x='62.0' y='232' text-anchor='middle'>Day 1</text><text x='178.5' y='232' text-anchor='middle'>2</text><text x='295.0' y='232' text-anchor='middle'>3</text><text x='411.5' y='232' text-anchor='middle'>4</text><text x='528.0' y='232' text-anchor='middle'>5</text><polyline class='series' style='stroke:var(--s0)' points='411.5,79.9 528.0,142.9'/><line style='stroke:var(--s0)' stroke-width='1.5' x1='532.0' y1='142.9' x2='552.0' y2='142.9'/><circle class='dot' style='fill:var(--s0)' cx='528.0' cy='142.9' r='5'/><text class='end' x='556.0' y='147.9'>GBU</text><circle class='hit' cx='411.5' cy='79.9' r='9'><title>GBU, Day 4: $128.30</title></circle><circle class='hit' cx='528.0' cy='142.9' r='9'><title>GBU, Day 5: $127.65</title></circle></svg></div></section>
 <section class="section"><h3>College Fair Pitch</h3><div class="body">We are Golden Bay University, located in the heart of San Francisco, California. We specialize in Environmental Sciences, Philosophy, History, and Mathematics, with a focus on combining technology, sustainability, and the humanities. Our university prides itself on being internationally friendly and tech-forward, especially through our new partnership with AI Corpone, which provides students with free access to the latest AI technology. Our mascot is the Golden Owl, and our school colors are International Orange, Deep Blue, and Gold, representing the Golden Gate Bridge, Pacific Ocean, and Golden State. Our slogan is &quot;Wisdom for the World, Innovation for the Earth.&quot;</div></section>
 <section class="section"><h3>College Characters</h3><p>No one has come forward.</p></section>
 <div class="grid">
