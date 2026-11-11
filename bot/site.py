@@ -131,6 +131,8 @@ blockquote cite { display:block; font:normal 13px/1.4 system-ui, sans-serif; col
 .button { display:inline-block; padding:11px 20px; background:var(--accent); color:var(--paper); border-radius:3px;
   font:700 16px/1.2 system-ui, sans-serif; text-decoration:none; letter-spacing:.02em; }
 .button:hover { color:var(--paper); filter:brightness(1.1); }
+.button.secondary { background:transparent; color:var(--accent); box-shadow:inset 0 0 0 2px var(--accent); }
+.button.secondary:hover { background:var(--accent); color:var(--paper); filter:none; }
 .join .late { margin:0; font-style:italic; }
 .join .help { margin:6px 0 0; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
 @media (max-width:560px) { .join { grid-template-columns:1fr; padding:16px; } .join .logo { width:140px; }
@@ -315,11 +317,11 @@ def _join_box(prefix: str) -> str:
 <div class="kicker">Want to Play?</div>
 <h2>List your university on the UnderAcademy Exchange</h2>
 <div class="actions"><a class="button" href="{_e(config.DISCORD_INVITE_URL)}">Join us on Discord</a>
-<a href="{HOW_TO_PLAY_URL}">Full rules</a></div>
+<a class="button secondary" href="{HOW_TO_PLAY_URL}">How to Play</a></div>
 <ol><li><b>Found a university.</b> Post a four-sentence pitch in <code>#{_e(channels['fair'])}</code>.</li>
 <li><b>Set a policy.</b> Post it in <code>#{_e(channels['policies'])}</code>.</li>
 <li><b>Confess.</b> Write a Secret Diary entry in <code>#{_e(channels['diaries'])}</code>.</li></ol>
-<p class="late">It's not too late. New universities list at the median.</p>{help_line}
+<p class="late">It's not too late. New universities listed nightly.</p>{help_line}
 </div></section>"""
 
 

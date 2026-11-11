@@ -429,7 +429,7 @@ def test_join_box_previews_and_ads(tmp_path, monkeypatch):
     join = page.split('<section class="join"')[1].split("</section>")[0]
     assert "https://discord.gg/abc" in join and "#college-pitches-rank" in join and "Contact us" in join
     assert "help@example.com" not in page and "mailto:help" not in page     # no address for harvesters to find
-    assert "median" in join
+    assert "listed nightly" in join and ">How to Play</a>" in join
 
 
 def test_character_named_like_a_ticker_stays_with_their_university(tmp_path):
