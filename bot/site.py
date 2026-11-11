@@ -304,8 +304,13 @@ def _join_box(prefix: str) -> str:
     channels = config.CHANNELS
     help_line = ""
     if config.CONTACT_EMAIL:
-        help_line = (f"<p class='help'>Trouble getting in? <a href='mailto:{_e(config.CONTACT_EMAIL)}'>"
-                     "Contact us</a>.</p>")
+        # The address never appears in the page as text: it's stored reversed and base64-encoded, and a click
+        # rebuilds the mailto link, so harvesters that scan pages for addresses find nothing.
+        hidden = base64.b64encode(config.CONTACT_EMAIL[::-1].encode()).decode()
+        help_line = (f"<p class='help'>Trouble getting in? <a class='contact' href='#join' data-c='{hidden}'>"
+                     "Contact us</a>.</p><script>document.querySelectorAll('a.contact').forEach(function (a) {"
+                     "a.addEventListener('click', function (e) { e.preventDefault(); "
+                     "location.href = 'mailto:' + atob(a.dataset.c).split('').reverse().join(''); }); });</script>")
     return f"""<section class="join" id="join">{_logo(prefix)}<div>
 <div class="kicker">Want to Play?</div>
 <h2>List your university on the UnderAcademy Exchange</h2>

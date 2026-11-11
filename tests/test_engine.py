@@ -427,7 +427,8 @@ def test_join_box_previews_and_ads(tmp_path, monkeypatch):
     monkeypatch.setattr(site.config, "DISCORD_INVITE_URL", "https://discord.gg/abc")
     page = site.build(db, game)["index.html"]
     join = page.split('<section class="join"')[1].split("</section>")[0]
-    assert "https://discord.gg/abc" in join and "#college-pitches-rank" in join and "mailto:help@example.com" in join
+    assert "https://discord.gg/abc" in join and "#college-pitches-rank" in join and "Contact us" in join
+    assert "help@example.com" not in page and "mailto:help" not in page     # no address for harvesters to find
     assert "median" in join
 
 
