@@ -188,7 +188,7 @@ def test_university_pages_keep_every_diary(tmp_path):
     assert all(f"Entry {who} from GrandPrairiePolytechnic" in page for who in range(3))
     assert page.index("Entry 2 from") < page.index("Entry 0 from")   # newest first
     assert "All lectures are given by robots." in page and "Onward" in page and "Motto: Onward" not in page
-    assert not any("RealName" in text for text in files.values())    # Discord names stay private
+    assert not any("RealName" in text for text in files.values() if isinstance(text, str))    # Discord names stay private
 
 
 def test_price_charts(tmp_path):
@@ -392,6 +392,43 @@ def test_publish_is_one_commit(monkeypatch):
     assert url == "https://someone.github.io/somerepo/"
     assert [c for c in calls if c[0] != "GET"] == [("POST", "/git/trees"), ("POST", "/git/commits"),
                                                    ("PATCH", "/git/refs/heads/" + site.config.SITE_BRANCH)]
+
+
+def test_publish_uploads_images_as_blobs(monkeypatch):
+    calls = []
+
+    def fake_api(method, path, body=None):
+        calls.append((method, path, body))
+        return {"object": {"sha": "head"}, "tree": {"sha": "base"}, "sha": "blobsha"}
+    monkeypatch.setattr(site, "_api", fake_api)
+    monkeypatch.setattr(site.config, "SITE_GITHUB_TOKEN", "token")
+    monkeypatch.setattr(site.config, "SITE_REPO", "someone/somerepo")
+    site.publish({"index.html": "a", "card.png": b"\x89PNG"})
+    blob = next(body for method, path, body in calls if path == "/git/blobs")
+    assert blob["encoding"] == "base64"
+    tree = next(body for method, path, body in calls if path == "/git/trees")["tree"]
+    assert {"path": "card.png", "mode": "100644", "type": "blob", "sha": "blobsha"} in tree
+
+
+def test_join_box_previews_and_ads(tmp_path, monkeypatch):
+    db, game = new_game(tmp_path)
+    monkeypatch.setattr(site.config, "SITE_REPO", "someone/somerepo")
+    monkeypatch.setattr(site.config, "DISCORD_INVITE_URL", "")
+    monkeypatch.setattr(site.config, "CONTACT_EMAIL", "help@example.com")
+    files = site.build(db, game)
+    page = files["index.html"]
+    assert "class=\"join\"" not in page                      # no invite, no join box
+    assert "how-rank-logo.png" in page and site.HOW_TO_PLAY_URL in page   # but the logo still links to the rules
+    assert site.PHUD_URL in page and site.JOURNAL_URL in page and site.MEANWHILE_URL in page
+    assert '<meta property="og:image" content="https://someone.github.io/somerepo/retort-card.png">' in page
+    assert '<meta name="twitter:card" content="summary_large_image">' in page
+    assert isinstance(files["retort-card.png"], bytes) and files["retort-card.png"][:4] == b"\x89PNG"
+
+    monkeypatch.setattr(site.config, "DISCORD_INVITE_URL", "https://discord.gg/abc")
+    page = site.build(db, game)["index.html"]
+    join = page.split('<section class="join"')[1].split("</section>")[0]
+    assert "https://discord.gg/abc" in join and "#college-pitches-rank" in join and "mailto:help@example.com" in join
+    assert "median" in join
 
 
 def test_character_named_like_a_ticker_stays_with_their_university(tmp_path):

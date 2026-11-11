@@ -95,6 +95,12 @@ already filled in.
 The page appears at https://markcmarino.github.io/how-rank-is-your-college/ and updates every night, with
 an archive of each day at `archive/day-N.html`. Even without a token, the bot writes the page to `site/index.html`.
 
+To recruit players from the page, set `DISCORD_INVITE_URL` (a Discord invite set to never expire) and
+`CONTACT_EMAIL` in `.env` (and in Railway's Variables). The front page then shows a "Want to Play?" box with the
+invite, a three-step quick start and a "Trouble getting in? Contact us" line. Leave `DISCORD_INVITE_URL` blank to
+hide the box. The link preview card and the netprov logo live in `bot/static/`; `scripts/make_card.py` remakes
+the card if the design changes.
+
 ### 4. Run it
 
 ```bash

@@ -6,6 +6,7 @@ it is also published to the repo's gh-pages branch, which GitHub Pages serves as
 
 from __future__ import annotations
 
+import base64
 import html
 import json
 import logging
@@ -22,6 +23,14 @@ from . import config, parsing, reports
 log = logging.getLogger(__name__)
 REVIEW_EDITIONS = 13   # nights in the game, so every university is reviewed at least once
 SITE_DIR = config.ROOT / "site"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+STATIC_FILES = ("how-rank-logo.png", "retort-card.png")   # copied to the top of the site as-is
+HOW_TO_PLAY_URL = "https://docs.google.com/document/d/16u8J-HXD07X7lR1iqq2Te2yHFXGbV3XfhwA86BsjJps/edit"
+PHUD_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeZowtq2nvum2E_BC5p-f_ltkr-cQFS-mE6MGxkV3_1Ty7B1Q/viewform"
+JOURNAL_URL = "https://claude.ai/artifact/AyvoBiiqzZb53CRaFs7xDp"
+UNDERACADEMY_URL = "https://underacademycollege.wordpress.com/"
+MEANWHILE_URL = "https://meanwhilenetprov.com/"
+CARD_ALT = "US Snooze & Whirled Retort: Big Digit Conference Rankings. How Rank is Your College?"
 
 CSS = """
 :root { --paper:#fbf8f1; --ink:#1d1b18; --muted:#6b645a; --rule:#d9d1c3; --accent:#8c1c13; --up:#1f6b3a; --down:#a1261b; --band:#f1ebdf;
@@ -110,6 +119,30 @@ td.name { overflow-wrap:anywhere; }
 .story .who { font:600 12px/1.4 system-ui, sans-serif; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
 blockquote { margin:0 0 16px; padding:0 0 0 14px; border-left:3px solid var(--accent); font-style:italic; }
 blockquote cite { display:block; font:normal 13px/1.4 system-ui, sans-serif; color:var(--muted); margin-top:4px; }
+.join { display:grid; grid-template-columns:150px 1fr; gap:20px 28px; align-items:start; margin:16px 0 4px; padding:18px 20px;
+  border:1px solid var(--ink); border-top:4px solid var(--accent); background:var(--band); }
+.join .logo img { display:block; width:100%; height:auto; border:1px solid var(--rule); }
+.join .kicker { font:700 12px/1.3 system-ui, sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.join h2 { font-size:clamp(22px, 3.4vw, 30px); line-height:1.15; margin:4px 0 12px; }
+.join ol { margin:0 0 12px; padding-left:22px; font:15px/1.5 system-ui, sans-serif; }
+.join li { margin-bottom:4px; }
+.join code { font:600 14px ui-monospace, Menlo, Consolas, monospace; overflow-wrap:anywhere; }
+.join .actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin:0 0 10px; font:15px/1.4 system-ui, sans-serif; }
+.button { display:inline-block; padding:11px 20px; background:var(--accent); color:var(--paper); border-radius:3px;
+  font:700 16px/1.2 system-ui, sans-serif; text-decoration:none; letter-spacing:.02em; }
+.button:hover { color:var(--paper); filter:brightness(1.1); }
+.join .late { margin:0; font-style:italic; }
+.join .help { margin:6px 0 0; font:13px/1.4 system-ui, sans-serif; color:var(--muted); }
+@media (max-width:560px) { .join { grid-template-columns:1fr; padding:16px; } .join .logo { width:140px; }
+  .join .actions .button { display:block; text-align:center; width:100%; } }
+.ads { padding:20px 0 16px; border-bottom:1px solid var(--rule); }
+.ad-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; }
+.ad { border:3px double var(--ink); padding:16px 18px; text-align:center; }
+.ad .small { font:600 11px/1.3 system-ui, sans-serif; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+.ad h4 { margin:6px 0 6px; font-size:24px; line-height:1.15; }
+.ad p { margin:0 0 12px; font-size:16px; }
+.sponsors { display:flex; align-items:center; gap:16px; margin-top:16px; font:14px/1.5 system-ui, sans-serif; color:var(--muted); }
+.sponsors img { width:72px; height:auto; flex:none; border:1px solid var(--rule); }
 footer { margin-top:40px; border-top:3px double var(--ink); padding-top:12px; font:13px/1.5 system-ui, sans-serif; color:var(--muted); text-align:center; }
 """
 
@@ -122,19 +155,40 @@ def _slug(school) -> str:
     return school["tag_key"] or f"school-{school['id']}"
 
 
-def _shell(title: str, description: str, home: str, body: str) -> str:
-    """The parts every page shares. home is the relative link back to the front page."""
+def _preview_tags(title: str, description: str, home: str, path: str) -> str:
+    """Open Graph and Twitter card tags, so a shared link shows the masthead card. Social sites need absolute
+    addresses, so those come from SITE_REPO; without it the image falls back to a relative link."""
+    base = public_url()
+    image = f"{base}retort-card.png" if base else home.replace("index.html", "") + "retort-card.png"
+    tags = [("property", "og:type", "website"), ("property", "og:site_name", "US Snooze & Whirled Retort"),
+            ("property", "og:title", title), ("property", "og:description", description),
+            ("property", "og:image", image), ("property", "og:image:width", "1200"),
+            ("property", "og:image:height", "630"), ("property", "og:image:alt", CARD_ALT),
+            ("name", "twitter:card", "summary_large_image"), ("name", "twitter:title", title),
+            ("name", "twitter:description", description), ("name", "twitter:image", image),
+            ("name", "twitter:image:alt", CARD_ALT)]
+    if base:
+        tags.insert(2, ("property", "og:url", base + path))
+    return "\n".join(f'<meta {attr}="{name}" content="{_e(value)}">' for attr, name, value in tags)
+
+
+def _shell(title: str, description: str, home: str, body: str, path: str = "") -> str:
+    """The parts every page shares. home is the relative link back to the front page; path is this page's
+    address within the site, for link previews."""
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{_e(title)}</title>
 <meta name="description" content="{_e(description)}">
+{_preview_tags(title, description, home, path)}
 <style>{CSS}</style></head>
 <body><div class="wrap">
 <header class="masthead"><div class="over">The UnderAcademy Exchange presents</div>
 <h1><a href="{home}">US Snooze &amp; Whirled Retort</a></h1>
 <div class="over">Big Digit Conference Rankings · How Rank is Your College?</div></header>
 {body}
-<footer>A netprov. Any resemblance to real universities, living or dead, is purely coincidental.<br>
+<footer>A netprov sponsored by <a href="{UNDERACADEMY_URL}">UnderAcademy College</a>, from
+<a href="{MEANWHILE_URL}">Meanwhile... netprov Studio</a>. <a href="{HOW_TO_PLAY_URL}">How to Play</a>.<br>
+Any resemblance to real universities, living or dead, is purely coincidental.<br>
 Share prices are not financial advice. Nothing is.</footer>
 </div></body></html>"""
 
@@ -237,9 +291,51 @@ def _under_review(db, day: int, school_ids: list[int]) -> list[int]:
     return picks
 
 
-def build(db, game) -> dict[str, str]:
-    """Returns {path: content} for the site: index.html, rankings.json, a dated archive page and a page for
-    each university."""
+def _logo(prefix: str) -> str:
+    return (f"<a class='logo' href='{HOW_TO_PLAY_URL}' title='How to Play'><img src='{prefix}how-rank-logo.png' "
+            "alt='How Rank is Your College? AI University Futures Trading, a netprov. Read How to Play.' "
+            "width='480' height='480'></a>")
+
+
+def _join_box(prefix: str) -> str:
+    """The recruiting box near the top of the front page. Left out unless DISCORD_INVITE_URL is set."""
+    if not config.DISCORD_INVITE_URL:
+        return ""
+    channels = config.CHANNELS
+    help_line = ""
+    if config.CONTACT_EMAIL:
+        help_line = (f"<p class='help'>Trouble getting in? <a href='mailto:{_e(config.CONTACT_EMAIL)}'>"
+                     "Contact us</a>.</p>")
+    return f"""<section class="join" id="join">{_logo(prefix)}<div>
+<div class="kicker">Want to Play?</div>
+<h2>List your university on the UnderAcademy Exchange</h2>
+<div class="actions"><a class="button" href="{_e(config.DISCORD_INVITE_URL)}">Join us on Discord</a>
+<a href="{HOW_TO_PLAY_URL}">Full rules</a></div>
+<ol><li><b>Found a university.</b> Post a four-sentence pitch in <code>#{_e(channels['fair'])}</code>.</li>
+<li><b>Set a policy.</b> Post it in <code>#{_e(channels['policies'])}</code>.</li>
+<li><b>Confess.</b> Write a Secret Diary entry in <code>#{_e(channels['diaries'])}</code>.</li></ol>
+<p class="late">It's not too late. New universities list at the median.</p>{help_line}
+</div></section>"""
+
+
+def _ads(prefix: str) -> str:
+    """The classifieds, plus the sponsor line. The netprov logo sits here when the join box is off."""
+    logo = "" if config.DISCORD_INVITE_URL else _logo(prefix).replace("class='logo'", "class='logo-small'")
+    return f"""<section class="ads"><h3>Classifieds</h3><div class="ad-grid">
+<div class="ad"><div class="small">Advertisement</div><h4>Done with College?</h4>
+<p>Get a PhD at UnderAcademy College. Ask about our PhuD.</p>
+<a class="button" href="{PHUD_URL}">Apply for your PhuD</a></div>
+<div class="ad"><div class="small">Advertisement</div><h4>The Journal of Untrained Models</h4>
+<p>Scholarship that has never seen a training set.</p>
+<a class="button" href="{JOURNAL_URL}">Read the Journal</a></div>
+</div>
+<p class="sponsors">{logo}<span>How Rank is Your College? is sponsored by <a href="{UNDERACADEMY_URL}">UnderAcademy
+College</a> and produced by <a href="{MEANWHILE_URL}">Meanwhile... netprov Studio</a>.</span></p></section>"""
+
+
+def build(db, game) -> dict:
+    """Returns {path: content} for the site: index.html, rankings.json, a dated archive page, a page for
+    each university, and the images in bot/static (as bytes)."""
     day = db.day
     snap, prev = db.snapshot(day), db.snapshot(day - 1)
     schools = {s["id"]: s for s in db.schools()}
@@ -316,7 +412,7 @@ def build(db, game) -> dict[str, str]:
                                                "JOIN schools s ON s.id = p.school_id").fetchall() if p["id"] in filed_ids),
                    key=lambda p: (rank_of.get(p["school_id"], 9999), p["id"]))
 
-    def front(prefix: str, home: str) -> str:
+    def front(prefix: str, home: str, path: str) -> str:
         def link(sid: int, text: str) -> str:
             return f"<a href='{prefix}university/{quote_url(_slug(schools[sid]))}.html'>{_e(text)}</a>"
 
@@ -387,17 +483,19 @@ def build(db, game) -> dict[str, str]:
                       f"""{dateline}
 <div class="ticker">{ticker or "<span>Markets closed</span>"}</div>
 {nav}
+{_join_box(prefix)}
 {school_menu(prefix)}
 {chart}
 <section class="lead">{lead_html}</section>
 {reviews}
 <section class="section rankings"><h3>The Rankings</h3><div class="table-wrap"><table><thead><tr><th class="num">#</th><th>University</th><th>Ticker</th>
 {'<th class="trend">Trend</th>' if day > 1 else ''}<th class="num">Price</th><th class="num">Day</th></tr></thead><tbody>{table}</tbody></table></div></section>
+{_ads(prefix)}
 <div class="grid">
 <section><h3>Top Stories</h3>{stories}</section>
 <section><h3>Overheard in the Secret Diaries</h3>{diary_html}</section>
 </div>
-<section class="section"><h3>From the Policy Register</h3>{register}</section>""")
+<section class="section"><h3>From the Policy Register</h3>{register}</section>""", path)
 
     def school_menu(prefix: str) -> str:
         links = "".join(f"<a href='{prefix}university/{quote_url(_slug(s))}.html'>{_e(s['name'])}</a>"
@@ -442,7 +540,7 @@ def build(db, game) -> dict[str, str]:
         news = "".join(f"<div class='story'><div class='who'>Day {e['day']}</div>{_e(e['text'])}</div>"
                        for e in db.school_events(sid))
         tagline = school["motto"] or f"Trading as {school['code']} on the UnderAcademy Exchange."
-        return _shell(f"{school['name']} · US Snooze & Whirled Retort", tagline, "../index.html",
+        return _shell(f"{school['name']} · US Snooze & Whirled Retort", tagline, "../index.html", path=f"university/{_slug(school)}.html", body=
                       f"""{dateline}
 <nav class="days"><a href="../index.html">Back to the front page</a></nav>
 {school_menu("../")}
@@ -459,10 +557,12 @@ def build(db, game) -> dict[str, str]:
     data = json.dumps({"day": day, "round": rnd["name"] if rnd else None, "commentary": commentary,
                        "rankings": [{k: r[k] for k in ("rank", "name", "hashtag", "code", "price", "score")}
                                     for r in rows]}, indent=1)
-    files = {"index.html": front("", "index.html"), "rankings.json": data,
-             f"archive/day-{day}.html": front("../", "../index.html")}
+    files: dict = {"index.html": front("", "index.html", ""), "rankings.json": data,
+                   f"archive/day-{day}.html": front("../", "../index.html", f"archive/day-{day}.html")}
     for school in schools.values():
         files[f"university/{_slug(school)}.html"] = university(school)
+    for name in STATIC_FILES:
+        files[name] = (STATIC_DIR / name).read_bytes()
     return files
 
 
@@ -477,11 +577,14 @@ def reports_excerpt(text: str, limit: int = 220) -> str:
     return flat if len(flat) <= limit else flat[:limit].rsplit(" ", 1)[0] + "..."
 
 
-def write_local(files: dict[str, str]) -> Path:
+def write_local(files: dict) -> Path:
     for path, content in files.items():
         target = SITE_DIR / path
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        if isinstance(content, bytes):
+            target.write_bytes(content)
+        else:
+            target.write_text(content, encoding="utf-8")
     return SITE_DIR / "index.html"
 
 
@@ -516,7 +619,15 @@ def public_url() -> str | None:
     return f"https://{owner}.github.io/{repo}/"
 
 
-def publish(files: dict[str, str]) -> str | None:
+def _tree_entry(path: str, content) -> dict:
+    """Text goes inline; images are uploaded as base64 blobs first."""
+    if isinstance(content, bytes):
+        blob = _api("POST", "/git/blobs", {"content": base64.b64encode(content).decode(), "encoding": "base64"})
+        return {"path": path, "mode": "100644", "type": "blob", "sha": blob["sha"]}
+    return {"path": path, "mode": "100644", "type": "blob", "content": content}
+
+
+def publish(files: dict) -> str | None:
     """Uploads the site to the gh-pages branch as one commit. Returns the public URL, or None if not configured."""
     if not (config.SITE_GITHUB_TOKEN and config.SITE_REPO):
         return None
@@ -525,7 +636,7 @@ def publish(files: dict[str, str]) -> str | None:
     head = _api("GET", f"/git/ref/heads/{branch}")["object"]["sha"]
     base_tree = _api("GET", f"/git/commits/{head}")["tree"]["sha"]
     tree = _api("POST", "/git/trees", {"base_tree": base_tree, "tree": [
-        {"path": path, "mode": "100644", "type": "blob", "content": content} for path, content in files.items()]})
+        _tree_entry(path, content) for path, content in files.items()]})
     commit = _api("POST", "/git/commits", {"message": "Update the Retort", "tree": tree["sha"], "parents": [head]})
     _api("PATCH", f"/git/refs/heads/{branch}", {"sha": commit["sha"]})
     return public_url()

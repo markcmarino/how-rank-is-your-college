@@ -51,6 +51,9 @@ TABLES_SHEET_ID = os.getenv("TABLES_SHEET_ID", "")
 SITE_GITHUB_TOKEN = os.getenv("SITE_GITHUB_TOKEN", "")
 SITE_REPO = os.getenv("SITE_REPO", "")            # e.g. markcmarino/how-rank-is-your-college
 SITE_BRANCH = os.getenv("SITE_BRANCH", "gh-pages")
+# Recruiting box on the Retort's front page. It's left out unless DISCORD_INVITE_URL is set.
+DISCORD_INVITE_URL = os.getenv("DISCORD_INVITE_URL", "").strip()
+CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "").strip()
 
 # AI consequences (optional). Without an API key the bot uses the random tables.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
