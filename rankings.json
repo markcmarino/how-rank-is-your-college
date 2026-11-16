@@ -1,159 +1,167 @@
 {
- "day": 9,
+ "day": 10,
  "round": "Round 2: Midterms",
- "commentary": "BayTech (BT) drifted lower 7.2% as investors digested \"Policy Amendment: Marine Companion Accountability Act Following...\". Unc Uni (UU) fell 5.2% after AI Corpone mentioned \"In response to recent midterm feedback regarding student...\" on a podcast. Golden Bay University. Class Section: 11am (GBU) rebounded 3.2% as investors digested an absence of policy. AC (AC) rebounded 2.9% amid fresh questions about \"Policy Amendment In response to increasing student stress, unhealthy...\".",
+ "commentary": "University of Almond Joys (UNIJ) rebounded 6.5% after a viral diary entry about \"Now that students have left the residence halls for Bot Bay, the...\". Lumina University (LUM) soared 4.8% after a chatbot summarized \"As a result of new policies, we have been seeing increased fear...\" incorrectly. Cloud Tech (CT) leapt 4.5% as rumors about \"Notice to all students\" spread through the dining hall. University of Northern California (UONC) soared 4.0% as rumors about \"Effective immediately!!\" spread through the dining hall.",
  "rankings": [
   {
    "rank": 1,
-   "name": "Tauk Tech U",
-   "hashtag": "TaukTechU",
-   "code": "TTU",
-   "price": 133.55,
-   "score": 53.42
+   "name": "University of Almond Joys",
+   "hashtag": "unijoy",
+   "code": "UNIJ",
+   "price": 137.53,
+   "score": 55.01
   },
   {
    "rank": 2,
-   "name": "USS",
-   "hashtag": "USS",
-   "code": "USS",
-   "price": 133.25,
-   "score": 53.3
-  },
-  {
-   "rank": 3,
-   "name": "AITA",
-   "hashtag": "AITA",
-   "code": "AITA",
-   "price": 132.93,
-   "score": 53.17
-  },
-  {
-   "rank": 4,
-   "name": "Midnight Institute of Community Access Teaching",
-   "hashtag": "MidnightInstituteofCommunityAccessTeaching",
-   "code": "MICAT",
-   "price": 132.6,
-   "score": 53.04
-  },
-  {
-   "rank": 5,
    "name": "AC",
    "hashtag": "AC",
    "code": "AC",
-   "price": 132.17,
-   "score": 52.87
+   "price": 137.22,
+   "score": 54.89
+  },
+  {
+   "rank": 3,
+   "name": "USS",
+   "hashtag": "USS",
+   "code": "USS",
+   "price": 135.68,
+   "score": 54.27
+  },
+  {
+   "rank": 4,
+   "name": "Lumina University",
+   "hashtag": "LuminaUniversity",
+   "code": "LUM",
+   "price": 135.5,
+   "score": 54.2
+  },
+  {
+   "rank": 5,
+   "name": "Cloud Tech",
+   "hashtag": "CloudTech",
+   "code": "CT",
+   "price": 135.1,
+   "score": 54.04
   },
   {
    "rank": 6,
-   "name": "Golden Bay University. Class Section: 11am",
-   "hashtag": "GBUni",
-   "code": "GBU",
-   "price": 131.93,
-   "score": 52.77
+   "name": "Tauk Tech U",
+   "hashtag": "TaukTechU",
+   "code": "TTU",
+   "price": 134.4,
+   "score": 53.76
   },
   {
    "rank": 7,
    "name": "University of Antartica",
    "hashtag": "UniversityOfAntartica",
    "code": "UOA",
-   "price": 131.6,
-   "score": 52.64
+   "price": 134.25,
+   "score": 53.7
   },
   {
    "rank": 8,
-   "name": "Unc Uni",
-   "hashtag": "UncUni",
-   "code": "UU",
-   "price": 129.97,
-   "score": 51.99
+   "name": "Golden Bay University. Class Section: 11am",
+   "hashtag": "GBUni",
+   "code": "GBU",
+   "price": 133.15,
+   "score": 53.26
   },
   {
    "rank": 9,
-   "name": "Golden Bay Uni",
-   "hashtag": "GoldenBayUni",
-   "code": "GBUD",
-   "price": 129.62,
-   "score": 51.85
+   "name": "AITA",
+   "hashtag": "AITA",
+   "code": "AITA",
+   "price": 132.78,
+   "score": 53.11
   },
   {
    "rank": 10,
-   "name": "Lumina University",
-   "hashtag": "LuminaUniversity",
-   "code": "LUM",
-   "price": 129.3,
-   "score": 51.72
-  },
-  {
-   "rank": 11,
-   "name": "Cloud Tech",
-   "hashtag": "CloudTech",
-   "code": "CT",
-   "price": 129.28,
-   "score": 51.71
-  },
-  {
-   "rank": 12,
-   "name": "University of Almond Joys",
-   "hashtag": "unijoy",
-   "code": "UNIJ",
-   "price": 129.18,
-   "score": 51.67
-  },
-  {
-   "rank": 13,
-   "name": "BayTech",
-   "hashtag": "BayTech",
-   "code": "BT",
-   "price": 128.68,
-   "score": 51.47
-  },
-  {
-   "rank": 14,
-   "name": "Uo A",
-   "hashtag": "UoA",
-   "code": "UA",
-   "price": 127.62,
-   "score": 51.05
-  },
-  {
-   "rank": 15,
    "name": "University of Northern California",
    "hashtag": "UniversityOfNorthernCalifornia",
    "code": "UONC",
-   "price": 127.52,
-   "score": 51.01
+   "price": 132.6,
+   "score": 53.04
   },
   {
-   "rank": 16,
-   "name": "Crazy School",
-   "hashtag": "CrazySchool",
-   "code": "CS",
-   "price": 127.38,
-   "score": 50.95
-  },
-  {
-   "rank": 17,
+   "rank": 11,
    "name": "Grind U",
    "hashtag": "GrindU",
    "code": "GU",
-   "price": 127.22,
-   "score": 50.89
+   "price": 131.5,
+   "score": 52.6
   },
   {
-   "rank": 18,
+   "rank": 12,
+   "name": "Unc Uni",
+   "hashtag": "UncUni",
+   "code": "UU",
+   "price": 130.45,
+   "score": 52.18
+  },
+  {
+   "rank": 13,
+   "name": "Uo A",
+   "hashtag": "UoA",
+   "code": "UA",
+   "price": 129.2,
+   "score": 51.68
+  },
+  {
+   "rank": 14,
+   "name": "Garrick Allen Polytechnic University",
+   "hashtag": "Garrick",
+   "code": "GARR",
+   "price": 129.15,
+   "score": 51.66
+  },
+  {
+   "rank": 15,
+   "name": "Midnight Institute of Community Access Teaching",
+   "hashtag": "MidnightInstituteofCommunityAccessTeaching",
+   "code": "MICAT",
+   "price": 128.9,
+   "score": 51.56
+  },
+  {
+   "rank": 16,
    "name": "AITA University",
    "hashtag": "AITAUniversity",
    "code": "AITAU",
-   "price": 125.9,
-   "score": 50.36
+   "price": 128.22,
+   "score": 51.29
+  },
+  {
+   "rank": 17,
+   "name": "BayTech",
+   "hashtag": "BayTech",
+   "code": "BT",
+   "price": 128.07,
+   "score": 51.23
+  },
+  {
+   "rank": 18,
+   "name": "Crazy School",
+   "hashtag": "CrazySchool",
+   "code": "CS",
+   "price": 126.53,
+   "score": 50.61
   },
   {
    "rank": 19,
+   "name": "Golden Bay Uni",
+   "hashtag": "GoldenBayUni",
+   "code": "GBUD",
+   "price": 126.48,
+   "score": 50.59
+  },
+  {
+   "rank": 20,
    "name": "Lumina U",
    "hashtag": "LuminaU",
    "code": "LU",
-   "price": 123.18,
-   "score": 49.27
+   "price": 123.58,
+   "score": 49.43
   }
  ]
 }
