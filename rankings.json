@@ -1,175 +1,183 @@
 {
- "day": 12,
+ "day": 13,
  "round": "Round 3: Finals",
- "commentary": "Garrick Allen Polytechnic University (GARR) fell 4.8% as \"1 AI implementation policy NO.26: Following the administrative order,...\" entered its second news cycle. Uo A (UA) rallied 3.1% despite, or because of, an absence of policy. University of Northern California (UONC) crept higher 2.9% as \"After looking at student responses and activity, A.I\" entered its second news cycle. University of Antartica (UOA) crept higher 2.9% after a viral diary entry about \"After the recent threat of AI brainchips, there is a campus wide...\".",
+ "commentary": "BayTech (BT) tumbled 6.3% while analysts argued over \"Following recent concerns regarding the environmental impact of our...\". University of Almond Joys (UNIJ) plunged 5.7% on news that \"Now that students have left the residence halls for Bot Bay, the...\" is still in effect. Cloud Tech (CT) leapt 5.3% while analysts argued over \"Following several irregularities involving Pod Room occupancy...\". Tauk Tech U (TTU) soared 3.5% after a chatbot summarized \"Herewith and furthermore an addendum to TTU's \"only robots\" policy\" incorrectly.",
  "rankings": [
   {
    "rank": 1,
-   "name": "BayTech",
-   "hashtag": "BayTech",
-   "code": "BT",
-   "price": 146.28,
-   "score": 58.51
-  },
-  {
-   "rank": 2,
-   "name": "University of Almond Joys",
-   "hashtag": "unijoy",
-   "code": "UNIJ",
-   "price": 141.18,
-   "score": 56.47
-  },
-  {
-   "rank": 3,
    "name": "University of Northern California",
    "hashtag": "UniversityOfNorthernCalifornia",
    "code": "UONC",
-   "price": 137.75,
-   "score": 55.1
+   "price": 142.32,
+   "score": 56.93
+  },
+  {
+   "rank": 2,
+   "name": "Cloud Tech",
+   "hashtag": "CloudTech",
+   "code": "CT",
+   "price": 141.6,
+   "score": 56.64
+  },
+  {
+   "rank": 3,
+   "name": "University of Antartica",
+   "hashtag": "UniversityOfAntartica",
+   "code": "UOA",
+   "price": 138.72,
+   "score": 55.49
   },
   {
    "rank": 4,
    "name": "AC",
    "hashtag": "AC",
    "code": "AC",
-   "price": 136.4,
-   "score": 54.56
+   "price": 138.55,
+   "score": 55.42
   },
   {
    "rank": 5,
-   "name": "USS",
-   "hashtag": "USS",
-   "code": "USS",
-   "price": 136.22,
-   "score": 54.49
+   "name": "BayTech",
+   "hashtag": "BayTech",
+   "code": "BT",
+   "price": 137.12,
+   "score": 54.85
   },
   {
    "rank": 6,
-   "name": "University of Antartica",
-   "hashtag": "UniversityOfAntartica",
-   "code": "UOA",
-   "price": 135.0,
-   "score": 54.0
+   "name": "Tauk Tech U",
+   "hashtag": "TaukTechU",
+   "code": "TTU",
+   "price": 137.07,
+   "score": 54.83
   },
   {
    "rank": 7,
-   "name": "Cloud Tech",
-   "hashtag": "CloudTech",
-   "code": "CT",
-   "price": 134.5,
-   "score": 53.8
+   "name": "The Galapagos U",
+   "hashtag": "TheGalapagosU",
+   "code": "TGU",
+   "price": 136.4,
+   "score": 54.56
   },
   {
    "rank": 8,
    "name": "Lumina U",
    "hashtag": "LuminaU",
    "code": "LU",
-   "price": 134.38,
-   "score": 53.75
+   "price": 136.12,
+   "score": 54.45
   },
   {
    "rank": 9,
-   "name": "Golden Bay University. Class Section: 11am",
-   "hashtag": "GBUni",
-   "code": "GBU",
-   "price": 134.2,
-   "score": 53.68
-  },
-  {
-   "rank": 10,
-   "name": "Grind U",
-   "hashtag": "GrindU",
-   "code": "GU",
-   "price": 133.52,
-   "score": 53.41
-  },
-  {
-   "rank": 11,
-   "name": "Lumina University",
-   "hashtag": "LuminaUniversity",
-   "code": "LUM",
-   "price": 133.45,
-   "score": 53.38
-  },
-  {
-   "rank": 12,
-   "name": "AITA",
-   "hashtag": "AITA",
-   "code": "AITA",
-   "price": 133.3,
-   "score": 53.32
-  },
-  {
-   "rank": 13,
-   "name": "The Galapagos U",
-   "hashtag": "TheGalapagosU",
-   "code": "TGU",
-   "price": 133.28,
-   "score": 53.31
-  },
-  {
-   "rank": 14,
    "name": "Midnight Institute of Community Access Teaching",
    "hashtag": "MidnightInstituteofCommunityAccessTeaching",
    "code": "MICAT",
-   "price": 132.85,
-   "score": 53.14
+   "price": 135.1,
+   "score": 54.04
+  },
+  {
+   "rank": 10,
+   "name": "Grok Musk A",
+   "hashtag": "GrokMuskA",
+   "code": "GMA",
+   "price": 135.07,
+   "score": 54.03
+  },
+  {
+   "rank": 11,
+   "name": "Golden Bay University. Class Section: 11am",
+   "hashtag": "GBUni",
+   "code": "GBU",
+   "price": 134.5,
+   "score": 53.8
+  },
+  {
+   "rank": 12,
+   "name": "USS",
+   "hashtag": "USS",
+   "code": "USS",
+   "price": 134.28,
+   "score": 53.71
+  },
+  {
+   "rank": 13,
+   "name": "Grind U",
+   "hashtag": "GrindU",
+   "code": "GU",
+   "price": 134.1,
+   "score": 53.64
+  },
+  {
+   "rank": 14,
+   "name": "AITA",
+   "hashtag": "AITA",
+   "code": "AITA",
+   "price": 133.35,
+   "score": 53.34
   },
   {
    "rank": 15,
-   "name": "Uo A",
-   "hashtag": "UoA",
-   "code": "UA",
-   "price": 132.57,
-   "score": 53.03
+   "name": "University of Almond Joys",
+   "hashtag": "unijoy",
+   "code": "UNIJ",
+   "price": 133.12,
+   "score": 53.25
   },
   {
    "rank": 16,
-   "name": "Tauk Tech U",
-   "hashtag": "TaukTechU",
-   "code": "TTU",
-   "price": 132.38,
-   "score": 52.95
+   "name": "Uo A",
+   "hashtag": "UoA",
+   "code": "UA",
+   "price": 131.45,
+   "score": 52.58
   },
   {
    "rank": 17,
    "name": "Garrick Allen Polytechnic University",
    "hashtag": "Garrick",
    "code": "GARR",
-   "price": 128.7,
-   "score": 51.48
+   "price": 130.62,
+   "score": 52.25
   },
   {
    "rank": 18,
-   "name": "Unc Uni",
-   "hashtag": "UncUni",
-   "code": "UU",
-   "price": 128.42,
-   "score": 51.37
+   "name": "Lumina University",
+   "hashtag": "LuminaUniversity",
+   "code": "LUM",
+   "price": 129.25,
+   "score": 51.7
   },
   {
    "rank": 19,
-   "name": "Golden Bay Uni",
-   "hashtag": "GoldenBayUni",
-   "code": "GBUD",
-   "price": 128.22,
-   "score": 51.29
-  },
-  {
-   "rank": 20,
    "name": "AITA University",
    "hashtag": "AITAUniversity",
    "code": "AITAU",
-   "price": 126.42,
-   "score": 50.57
+   "price": 129.22,
+   "score": 51.69
+  },
+  {
+   "rank": 20,
+   "name": "Unc Uni",
+   "hashtag": "UncUni",
+   "code": "UU",
+   "price": 128.62,
+   "score": 51.45
   },
   {
    "rank": 21,
+   "name": "Golden Bay Uni",
+   "hashtag": "GoldenBayUni",
+   "code": "GBUD",
+   "price": 128.52,
+   "score": 51.41
+  },
+  {
+   "rank": 22,
    "name": "Crazy School",
    "hashtag": "CrazySchool",
    "code": "CS",
-   "price": 122.2,
-   "score": 48.88
+   "price": 123.05,
+   "score": 49.22
   }
  ]
 }
