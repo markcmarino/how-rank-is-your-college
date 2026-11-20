@@ -367,13 +367,10 @@ def build(db, game) -> dict:
         cls = "up" if pct > 0.005 else ("down" if pct < -0.005 else "")
         return pct, cls
 
-    # Lead story: the biggest mover
+    # Lead story: growth and participation, never a slide (play is intermittent by design)
     lead_html = "<h2>Markets await the first closing bell</h2><p>No trading yet. Analysts are stretching.</p>"
     if rows:
-        mover = max(rows, key=lambda r: abs(change(r)[0]))
-        pct, _ = change(mover)
-        verb = "Soars" if pct > 0 else ("Sinks" if pct < 0 else "Holds Steady")
-        lead_html = (f"<h2>{_e(mover['name'])} {verb} {abs(pct):.1f}% on the UnderAcademy Exchange</h2>"
+        lead_html = (f"<h2>{_e(lead_headline(rows, db.school_post_counts()))}</h2>"
                      f"<p>{_e(commentary)}</p>")
 
     ticker = "".join(
@@ -571,6 +568,21 @@ def build(db, game) -> dict:
     for name in STATIC_FILES:
         files[name] = (STATIC_DIR / name).read_bytes()
     return files
+
+
+def lead_headline(rows: list[dict], post_counts) -> str:
+    """The front page headline. Leads with the biggest gainer. On a day with no gainers it credits the
+    university with the most posts filed to date, so a quiet stretch never reads as a failure."""
+    gains = [(reports.pct_change(r["price"], r["prev_price"]), r) for r in rows]
+    pct, best = max(gains, key=lambda g: g[0], default=(0.0, None))
+    if best and pct > 0.005:
+        return f"{best['name']} Soars {pct:.1f}% on the UnderAcademy Exchange"
+    busiest = next((c for c in post_counts if c["posts"]), None)
+    if busiest:
+        n = busiest["posts"]
+        return f"{busiest['name']} Leads the Exchange With {n} {'Post' if n == 1 else 'Posts'} Filed to Date"
+    leader = min(rows, key=lambda r: r["rank"])
+    return f"{leader['name']} Holds the Top Spot on the UnderAcademy Exchange"
 
 
 def move_class(r: dict) -> str:

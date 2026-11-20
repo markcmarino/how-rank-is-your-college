@@ -555,3 +555,16 @@ def test_posts_count_in_proportion_to_team_size(tmp_path):
     sizes = game.team_sizes()
     assert sizes[db.find_school("TaukTechU")["id"]] == 3       # Rob's three characters still count as one player
     assert sizes[db.find_school("LakeHubris")["id"]] == 1      # no characters yet: whoever has posted
+
+
+def test_lead_headline_celebrates_growth_not_slides():
+    rows = [{"name": "Sinking U", "rank": 1, "price": 50.0, "prev_price": 80.0},
+            {"name": "Rising U", "rank": 2, "price": 41.0, "prev_price": 40.0}]
+    assert site.lead_headline(rows, []) == "Rising U Soars 2.5% on the UnderAcademy Exchange"
+    flat = [{"name": "Sinking U", "rank": 1, "price": 50.0, "prev_price": 80.0},
+            {"name": "Steady U", "rank": 2, "price": 40.0, "prev_price": 40.0}]
+    counts = [{"name": "Busy U", "posts": 12}, {"name": "Steady U", "posts": 3}]
+    headline = site.lead_headline(flat, counts)
+    assert headline == "Busy U Leads the Exchange With 12 Posts Filed to Date"
+    assert site.lead_headline(flat, [{"name": "Nobody U", "posts": 0}]) == \
+        "Sinking U Holds the Top Spot on the UnderAcademy Exchange"
