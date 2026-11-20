@@ -48,19 +48,50 @@ def rank_move(r: dict) -> str:
     return f" ▲{diff}" if diff > 0 else (f" ▼{-diff}" if diff < 0 else "")
 
 
+# Fallback for the Market Commentary table's "Dip Spin" rows. A drop is never a scolding: like a fantasy league
+# recap, every university gets a line it can brag about, and its own policies take the credit.
+DIP_SPIN = [
+    "{name} ({code}) shed {pct}%, which its provost called a deliberate return to artisanal enrollment, "
+    "made possible by {policy}.",
+    "{name} ({code}) eased {pct}% as the Board, still glowing about {policy}, declared a rebuilding year.",
+    "{name} ({code}) gave back {pct}%, a move analysts called bold, visionary and, given {policy}, extremely on brand.",
+    "{name} ({code}) slipped {pct}% in what its communications office insists is a stealth rally powered by {policy}.",
+    "{name} ({code}) dipped {pct}%; insiders say the university is saving its best moves for later, starting with "
+    "{policy}.",
+    "{name} ({code}) took a {pct}% scenic detour, and its chatbot dean has already rebranded the drop as a feature "
+    "of {policy}.",
+    "{name} ({code}) lost {pct}% but gained a powerful new talking point in {policy}.",
+    "{name} ({code}) settled {pct}% lower, a level the trustees describe as cozy and exactly what {policy} intended.",
+]
+
+
 def template_commentary(movers: list[dict], rng: random.Random, phrases: dict) -> str:
-    """Closing-bell commentary from the Market Commentary table. Cites each mover's own policies."""
+    """Closing-bell commentary from the Market Commentary table. Gainers lead; dips get a playful spin.
+    Cites each mover's own policies."""
+    movers = [m for m in movers if abs(m["change_pct"]) >= 0.05]
     if not movers:
         return rng.choice(phrases.get("quiet_day") or ["Trading was quiet."])
+    movers = sorted(movers, key=lambda m: -m["change_pct"])   # biggest gain first, dips after
     up = phrases.get("up_verb") or ["rose"]
-    down = phrases.get("down_verb") or ["fell"]
     reasons = phrases.get("reason") or ["on news about {policy}"]
+    spins = phrases.get("dip_spin") or DIP_SPIN
+    def deck(options):   # deals phrases without repeats until the deck runs out
+        cards = []
+        while True:
+            if not cards:
+                cards = rng.sample(options, len(options))
+            yield cards.pop()
+    up, reasons, spins = deck(up), deck(reasons), deck(spins)
     sentences = []
     for m in movers[:4]:
-        cite = f"\"{m['policies'][-1]}\"" if m["policies"] else "an absence of policy"
-        verb = rng.choice(up if m["change_pct"] >= 0 else down)
-        reason = rng.choice(reasons).replace("{policy}", cite)
-        sentences.append(f"{m['name']} ({m['code']}) {verb} {abs(m['change_pct']):.1f}% {reason}.")
+        cite = f"\"{m['policies'][-1]}\"" if m["policies"] else "its famously mysterious strategic plan"
+        pct = f"{abs(m['change_pct']):.1f}"
+        if m["change_pct"] > 0:
+            reason = next(reasons).replace("{policy}", cite)
+            sentences.append(f"{m['name']} ({m['code']}) {next(up)} {pct}% {reason}.")
+        else:
+            sentences.append(next(spins).replace("{name}", m["name"]).replace("{code}", m["code"])
+                             .replace("{pct}", pct).replace("{policy}", cite))
     return " ".join(sentences)
 
 

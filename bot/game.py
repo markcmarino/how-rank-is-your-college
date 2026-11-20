@@ -398,7 +398,8 @@ class Game:
                            "change_pct": round(reports.pct_change(r["price"], r["prev_price"]), 1),
                            "policies": policies[-5:], "todays_events": events[:4]})
         movers.sort(key=lambda m: abs(m["change_pct"]), reverse=True)
-        return movers[:6]
+        biggest = movers[:6]
+        return sorted(biggest, key=lambda m: -m["change_pct"])   # gainers lead the commentary
 
     # ---- the finale ---------------------------------------------------------
     def can_vote_for(self, user_id: int, school_id: int) -> bool:

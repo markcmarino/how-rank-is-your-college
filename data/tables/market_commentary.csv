@@ -27,6 +27,14 @@ Reason,after a chatbot summarized {policy} incorrectly
 Reason,as {policy} entered its second news cycle
 Reason,"despite, or because of, {policy}"
 Reason,after a viral diary entry about {policy}
+Dip Spin,"{name} ({code}) shed {pct}%, which its provost called a deliberate return to artisanal enrollment, made possible by {policy}."
+Dip Spin,"{name} ({code}) eased {pct}% as the Board, still glowing about {policy}, declared a rebuilding year."
+Dip Spin,"{name} ({code}) gave back {pct}%, a move analysts called bold, visionary and, given {policy}, extremely on brand."
+Dip Spin,{name} ({code}) slipped {pct}% in what its communications office insists is a stealth rally powered by {policy}.
+Dip Spin,"{name} ({code}) dipped {pct}%; insiders say the university is saving its best moves for later, starting with {policy}."
+Dip Spin,"{name} ({code}) took a {pct}% scenic detour, and its chatbot dean has already rebranded the drop as a feature of {policy}."
+Dip Spin,{name} ({code}) lost {pct}% but gained a powerful new talking point in {policy}.
+Dip Spin,"{name} ({code}) settled {pct}% lower, a level the trustees describe as cozy and exactly what {policy} intended."
 Quiet Day,"Trading was quiet. Analysts blamed the weather, then the analysts."
 Quiet Day,The Exchange closed flat. Several traders were seen staring into the middle distance.
 Quiet Day,A slow day on the Exchange. Even AI Corpone took a nap.

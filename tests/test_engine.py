@@ -568,3 +568,14 @@ def test_lead_headline_celebrates_growth_not_slides():
     assert headline == "Busy U Leads the Exchange With 12 Posts Filed to Date"
     assert site.lead_headline(flat, [{"name": "Nobody U", "posts": 0}]) == \
         "Sinking U Holds the Top Spot on the UnderAcademy Exchange"
+
+
+def test_commentary_leads_with_gains_and_spins_dips():
+    from bot import reports
+    movers = [{"name": "Down U", "code": "DU", "change_pct": -8.0, "policies": ["Robot Deans"]},
+              {"name": "Up U", "code": "UU", "change_pct": 3.0, "policies": []}]
+    text = reports.template_commentary(movers, random.Random(1), {})
+    assert text.startswith("Up U (UU)")
+    assert "Down U (DU)" in text and "\"Robot Deans\"" in text and "8.0%" in text
+    for word in ("slid", "tumbled", "plunged", "slumped"):
+        assert word not in text

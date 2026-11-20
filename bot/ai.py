@@ -131,7 +131,10 @@ async def market_commentary(movers: list[dict]) -> str | None:
     """A few sentences of wire-service commentary on the day's biggest movers, citing their policies."""
     prompt = ("Write the UnderAcademy Exchange closing-bell commentary: 3 to 5 sentences in the voice of a "
               "deadpan financial wire service. Explain the biggest moves by citing each university's own "
-              "policies by name and today's events. Use ticker symbols in parentheses. No headings, no lists, "
+              "policies by name and today's events. Lead with the gainers. Treat any drop the way a fantasy "
+              "league recap treats a loss: playful, never punitive, crediting the university's own absurd "
+              "policies so every team gets a line worth bragging about. Use ticker symbols in parentheses. "
+              "No headings, no lists, "
               "no em dashes.\n\nToday's movers:\n" + json.dumps(movers, indent=1))
     try:
         reply = await _client().messages.create(
